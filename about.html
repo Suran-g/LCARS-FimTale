@@ -2,10 +2,21 @@
 <html lang="zh-CN">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 	<title>About This Project</title>
 	<link rel="stylesheet" type="text/css" href="assets/classic.css">
 	<style>
+		/* 防止页面溢出 */
+		html, body {
+			overflow-x: hidden;
+			max-width: 100%;
+		}
+		
+		.wrap-everything {
+			max-width: 100%;
+			overflow-x: hidden;
+		}
+		
 		.about-container {
 			max-width: 900px;
 			margin: 2rem auto;
