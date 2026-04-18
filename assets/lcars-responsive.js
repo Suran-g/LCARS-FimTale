@@ -105,28 +105,40 @@ var LCARSResponsive = (function() {
 	}
 	
 	/**
-	 * 应用data-cascade缩放优化
+	 * 应用data-cascade优化（仅调整字体和显示/隐藏行，不使用transform缩放）
 	 */
 	function applyDataCascadeScale() {
 		var wrapper = document.querySelector('.data-cascade-wrapper');
 		if (!wrapper) return;
 		
-		var scale = getOptimalScale();
 		var deviceType = getDeviceType();
-		
-		// 设置变换原点为左上角
-		wrapper.style.transformOrigin = 'top left';
-		wrapper.style.transform = 'scale(' + scale + ')';
+		var screenWidth = window.innerWidth;
 		
 		// 移动端：限制最大高度避免溢出
 		if (deviceType === 'mobile' || deviceType === 'tablet') {
 			var maxHeight = Math.floor(window.innerHeight * 0.35);
 			wrapper.style.maxHeight = maxHeight + 'px';
 			wrapper.style.overflow = 'hidden';
+			
+			// 根据屏幕宽度调整字体大小
+			var fontSize = '0.7rem';
+			if (screenWidth < 375) {
+				fontSize = '0.55rem';
+			} else if (screenWidth < 480) {
+				fontSize = '0.6rem';
+			} else if (screenWidth < 600) {
+				fontSize = '0.65rem';
+			}
+			
+			var rows = wrapper.querySelectorAll('.data-column div');
+			rows.forEach(function(el) {
+				el.style.fontSize = fontSize;
+				el.style.padding = '0.15rem 0.3rem';
+			});
 		}
 		
 		// 小屏幕：隐藏次要数据行
-		if (scale <= 0.65) {
+		if (screenWidth <= 480) {
 			var row5Elements = wrapper.querySelectorAll('.dc-row-5');
 			row5Elements.forEach(function(el) {
 				el.style.display = 'none';
@@ -134,10 +146,18 @@ var LCARSResponsive = (function() {
 		}
 		
 		// 极小屏幕：隐藏第4行
-		if (scale <= 0.6) {
+		if (screenWidth <= 375) {
 			var row4Elements = wrapper.querySelectorAll('.dc-row-4');
 			row4Elements.forEach(function(el) {
 				el.style.display = 'none';
+			});
+		}
+		
+		// 大屏幕：恢复所有行的显示
+		if (screenWidth > 480) {
+			var allRows = wrapper.querySelectorAll('.dc-row-4, .dc-row-5');
+			allRows.forEach(function(el) {
+				el.style.display = '';
 			});
 		}
 	}
@@ -270,7 +290,6 @@ var LCARSResponsive = (function() {
 		console.log('[LCARS Responsive] Browser:', getBrowserType());
 		console.log('[LCARS Responsive] Screen:', window.innerWidth + 'x' + window.innerHeight);
 		console.log('[LCARS Responsive] Orientation:', getScreenOrientation());
-		console.log('[LCARS Responsive] Scale:', getOptimalScale());
 	}
 	
 	/**
