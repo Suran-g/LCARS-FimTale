@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>LCARS Novel Reader</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" type="text/css" href="assets/classic.css">
+	<style>
+		.reader-content {
+			padding: 1.5rem;
+		}
+		
+		.novel-title {
+			color: #f96;
+			font-size: 2rem;
+			margin-bottom: 1rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+		
+		.author-name {
+			color: #c9f;
+			font-size: 1.2rem;
+			margin-bottom: 1rem;
+		}
+		
+		.stats-grid {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+			margin-bottom: 1.5rem;
+		}
+		
+		.stat-box {
+			background: rgba(137, 153, 255, 0.1);
+			border-left: 4px solid #89f;
+			padding: 0.75rem 1rem;
+			flex: 1;
+			min-width: 120px;
+		}
+		
+		.stat-box .label {
+			color: #668;
+			font-size: 0.8rem;
+			text-transform: uppercase;
+			display: block;
+			margin-bottom: 0.25rem;
+		}
+		
+		.stat-box .value {
+			color: #f96;
+			font-size: 1.1rem;
+			font-weight: bold;
+		}
+		
+		.score-box {
+			background: linear-gradient(135deg, #f96, #f80);
+			border-left: none;
+		}
+		
+		.score-box .value {
+			color: #000;
+		}
+		
+		.tags-section {
+			margin-bottom: 1.5rem;
+		}
+		
+		.tags-container {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+		
+		.tag {
+			padding: 0.25rem 1rem;
+			background: rgba(137, 153, 255, 0.2);
+			border-radius: 10px;
+			color: #89f;
+			font-size: 0.85rem;
+		}
+		
+		.content-section {
+			margin-top: 1.5rem;
+			padding-top: 1rem;
+			border-top: 2px solid rgba(201, 153, 255, 0.3);
+		}
+		
+		.novel-body {
+		font-size: 1.1rem;
+		line-height: 1.8;
+	}
+	
+	.novel-body * {
+		color: inherit;
+	}
+	
+	.novel-body p {
+		margin-bottom: 1.5rem;
+		text-indent: 2rem;
+	}
+		
+		.chapter-navigation {
+			display: flex;
+			justify-content: space-between;
+			margin-top: 2rem;
+			padding-top: 1rem;
+			border-top: 2px solid rgba(249, 153, 102, 0.3);
+		}
+		
+		.chapter-btn {
+			padding: 0.75rem 1.5rem;
+			background: #f96;
+			border: none;
+			border-radius: 15px;
+			color: #000;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+		
+		.chapter-btn:hover {
+			filter: brightness(115%);
+			transform: scale(1.05);
+		}
+		
+		.chapter-btn:disabled {
+			background: #666;
+			cursor: not-allowed;
+			filter: none;
+			transform: none;
+		}
+		
+		.novel-list-item {
+			display: flex;
+			flex-direction: column;
+			padding: 1rem;
+			margin-bottom: 0.5rem;
+			background: rgba(137, 153, 255, 0.05);
+			border-left: 4px solid #89f;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+		
+		.novel-list-item:hover {
+			background: rgba(137, 153, 255, 0.15);
+			border-left-color: #f96;
+		}
+		
+		.novel-list-item .title {
+			font-weight: bold;
+			color: #c9f;
+			font-size: 1.1rem;
+		}
+		
+		.novel-list-item .meta {
+			font-size: 0.85rem;
+			color: #668;
+			margin-top: 0.25rem;
+		}
+		
+		.hot-item {
+			display: flex;
+			align-items: center;
+			padding: 0.75rem;
+			margin-bottom: 0.5rem;
+			background: rgba(201, 153, 255, 0.05);
+			border-left: 4px solid #f96;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+		
+		.hot-item:hover {
+			background: rgba(201, 153, 255, 0.1);
+		}
+		
+		.hot-rank {
+			width: 2rem;
+			height: 2rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: #f96;
+			color: #000;
+			font-weight: bold;
+			border-radius: 50%;
+			margin-right: 1rem;
+			flex-shrink: 0;
+		}
+		
+		.hot-title {
+			color: #c9f;
+			font-weight: bold;
+		}
+		
+		.hot-meta {
+			font-size: 0.85rem;
+			color: #668;
+		}
+		
+		.section-title {
+			color: #f96;
+			font-size: 1.3rem;
+			margin-bottom: 1rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 2px solid rgba(201, 153, 255, 0.3);
+		}
+		
+		.loading-indicator {
+			text-align: center;
+			padding: 2rem;
+			color: #f96;
+		}
+		
+		.loading-indicator .blink {
+			animation: blink 1s infinite;
+		}
+		
+		@keyframes blink {
+			0%, 50% { opacity: 1; }
+			51%, 100% { opacity: 0.3; }
+		}
+		
+		.error-message {
+			background: rgba(204, 102, 102, 0.1);
+			border-left: 4px solid #c66;
+			padding: 1rem;
+			margin: 1rem 0;
+			color: #c66;
+		}
+		
+		.source-indicator {
+			font-size: 0.85rem;
+			padding: 0.25rem 0.75rem;
+			border-radius: 8px;
+			display: inline-block;
+			margin-left: 1rem;
+		}
+		
+		.source-api {
+			background: rgba(102, 204, 102, 0.2);
+			color: #6c6;
+		}
+		
+		.source-mock {
+			background: rgba(204, 102, 102, 0.2);
+			color: #c66;
+		}
+		
+	.menu-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.75rem;
+		margin-bottom: 0.5rem;
+		background: rgba(137, 153, 255, 0.1);
+		border-left: 4px solid #89f;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+	
+	.menu-item:hover {
+		background: rgba(137, 153, 255, 0.2);
+		border-left-color: #f96;
+	}
+	
+	.menu-item.active {
+		background: rgba(249, 153, 102, 0.2);
+		border-left-color: #f96;
+	}
+	
+	.menu-title {
+		color: #c9f;
+		font-weight: bold;
+	}
+	
+	.menu-meta {
+		font-size: 0.85rem;
+		color: #668;
+	}
+	
+	.sequel-item, .prequel-item {
+		padding: 0.75rem;
+		margin-bottom: 0.5rem;
+		background: rgba(201, 153, 255, 0.1);
+		border-left: 4px solid #c9f;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+	
+	.sequel-item:hover, .prequel-item:hover {
+		background: rgba(201, 153, 255, 0.2);
+	}
+	
+	.channel-item {
+		padding: 0.5rem 1rem;
+		margin-bottom: 0.5rem;
+		background: rgba(102, 204, 102, 0.1);
+		border-left: 4px solid #6c6;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+	
+	.channel-item:hover {
+		background: rgba(102, 204, 102, 0.2);
+	}
+	
+	.channel-name {
+		color: #6c6;
+		font-weight: bold;
+	}
+	
+	.recommend-item {
+		padding: 1rem;
+		margin-bottom: 1rem;
+		background: rgba(249, 153, 102, 0.1);
+		border-left: 4px solid #f96;
+	}
+	
+	.recommend-word {
+		color: #c9f;
+		font-style: italic;
+		margin: 0.5rem 0;
+		line-height: 1.6;
+	}
+	
+	.recommend-meta {
+		font-size: 0.85rem;
+		color: #668;
+	}
+	
+	.extra-section {
+		margin-top: 2rem;
+		padding-top: 1rem;
+		border-top: 2px solid rgba(201, 153, 255, 0.3);
+	}
+	
+	.search-container {
+		display: flex;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+	
+	.search-input {
+		flex: 1;
+		padding: 0.75rem 1rem;
+		background: rgba(0, 0, 0, 0.5);
+		border: 2px solid #89f;
+		border-radius: 10px;
+		color: inherit;
+		font-size: 1rem;
+	}
+	
+	.search-input:focus {
+		outline: none;
+		border-color: #c9f;
+	}
+	
+	.search-btn {
+		padding: 0.75rem 2rem;
+		background: #89f;
+		border: none;
+		border-radius: 15px;
+		color: #000;
+		font-weight: bold;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+	
+	.search-btn:hover {
+		filter: brightness(115%);
+		transform: scale(1.05);
+	}
+	
+	.search-results {
+		min-height: 200px;
+	}
+	
+	.search-result-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.75rem 1rem;
+		margin-bottom: 0.5rem;
+		background: rgba(137, 153, 255, 0.1);
+		border-left: 4px solid #89f;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+	
+	.search-result-item:hover {
+		background: rgba(137, 153, 255, 0.2);
+		border-left-color: #f96;
+	}
+	
+	.search-result-title {
+		font-weight: bold;
+		font-size: 1.1rem;
+	}
+	
+	.search-result-meta {
+		font-size: 0.85rem;
+		margin-top: 0.25rem;
+	}
+	
+	.search-result-score {
+		font-weight: bold;
+		min-width: 60px;
+		text-align: right;
+	}
+	
+	.search-placeholder {
+		text-align: center;
+		padding: 3rem 1rem;
+		color: #668;
+	}
+	
+	@media (max-width: 750px) {
+ 		.novel-title {
+ 			font-size: 1.5rem;
+ 		}
+ 		
+ 		.stats-grid {
+ 			flex-direction: column;
+ 		}
+ 		
+ 		.stat-box {
+ 			min-width: 100%;
+ 		}
+		
+		/* 响应式data-cascade布局调整 */
+		.data-cascade-wrapper {
+			transform: scale(0.85);
+			transform-origin: top left;
+		}
+		
+		.data-cascade-wrapper .data-column div {
+			font-size: 0.7rem;
+			padding: 0.2rem 0.4rem;
+		}
+	}
+	
+	@media (max-width: 600px) {
+		.data-cascade-wrapper {
+			transform: scale(0.75);
+		}
+		
+		.data-cascade-button-group {
+			flex-direction: column;
+		}
+		
+		.data-cascade-button-group nav {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.3rem;
+		}
+		
+		.data-cascade-button-group nav button {
+			flex: 1 1 auto;
+			min-width: 4rem;
+			font-size: 0.8rem;
+		}
+	}
+	
+	@media (max-width: 480px) {
+		.data-cascade-wrapper {
+			transform: scale(0.65);
+			max-height: 120px;
+			overflow: hidden;
+		}
+		
+		/* 隐藏部分次要数据行 */
+		.data-cascade-wrapper .dc-row-5 {
+			display: none;
+		}
+	}
+	</style>
+</head>
+<body>
+	<audio id="audio1" src="assets/beep1.mp3" preload="auto"></audio>
+	<audio id="audio2" src="assets/beep2.mp3" preload="auto"></audio>
+	<audio id="audio3" src="assets/beep3.mp3" preload="auto"></audio>
+
+	<div class="wrap-everything">
+		<section id="column-1">
+			<div class="lcars-frame">
+				<div class="frame-col-1">
+					<div class="frame-col-1-cell-a"></div>
+					<div class="frame-col-1-cell-b"></div>
+					<div class="frame-col-1-cell-c"></div>
+				</div>
+				<div class="frame-col-2"> </div>
+				<div class="frame-col-3 display-vertical">
+					<div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+				</div>
+				<div class="frame-col-4"> </div>
+				<div class="frame-col-5">
+					<div class="frame-col-5-cell-a"></div>
+					<div class="frame-col-5-cell-b"></div>
+					<div class="frame-col-5-cell-c"></div>
+				</div>
+			</div>
+			<div class="pillbox">
+				<button onclick="playSoundAndRedirect('audio1', 'classic-standard.html')" class="pill">HOME</button>
+				<button onclick="playSoundAndRedirect('audio1', 'novel-reader.html')" class="pill">READER</button>
+				<button onclick="playSoundAndRedirect('audio1', 'api-config.html')" class="pill">API</button>
+				<button onclick="playSoundAndRedirect('audio1', '#')" class="pill">HELP</button>
+			</div>
+			<div class="lcars-list-2 uppercase">
+				<ul>
+					<li id="sys-status">System: Online</li>
+					<li id="api-status-text">API: Not Config</li>
+					<li>Mode: Read</li>
+					<li class="bullet-almond-creme font-almond-creme" id="user-text">User: Guest</li>
+				</ul>
+			</div>
+		</section>
+		
+		<section id="column-2">
+			<div class="panel-11"> NOVEL </div>		
+			<button onclick="playSoundAndRedirect('audio2', 'classic-standard.html')" class="sidebar-button button-almond-creme">HOME</button>
+			<button onclick="playSoundAndRedirect('audio2', 'novel-reader.html')" class="sidebar-button button-butterscotch">READER</button>
+			<button onclick="playSoundAndRedirect('audio2', 'api-config.html')" class="sidebar-button button-african-violet">API KEY</button>
+			<div class="panel-12"> READER </div>
+			<div class="panel-13">ACTIVE</div>
+			<div class="panel-14">LOCAL</div>
+			<div class="panel-15">SECURE</div>
+		</section>
+		
+		<section id="column-3">
+			<div class="wrap">
+				<div class="left-frame-top">
+					<button onclick="playSoundAndRedirect('audio1', 'classic-standard.html')" class="panel-1-button">HOME</button>
+					<div class="panel-2">03<span class="hop">-READER</span></div>
+				</div>
+				<div class="right-frame-top">
+					<div class="banner">LCARS &#149; FimTale</div>
+					<div class="data-cascade-button-group">
+					<div class="data-cascade-wrapper" id="reader-data">
+						<div class="data-column">
+							<div class="dc-row-1">SYS</div>
+							<div class="dc-row-1">MODE</div>
+							<div class="dc-row-2">CHAP</div>
+							<div class="dc-row-3">PAGE</div>
+							<div class="dc-row-3">FONT</div>
+							<div class="dc-row-4">SPEED</div>
+							<div class="dc-row-5">AUTO</div>
+							<div class="dc-row-1">TIME</div>
+							<div class="dc-row-2">DATE</div>
+							<div class="dc-row-3">NET</div>
+							<div class="dc-row-4">API</div>
+							<div class="dc-row-5">DEV</div>
+							<div class="dc-row-1">LAT</div>
+							<div class="dc-row-2">CPU</div>
+							<div class="dc-row-3">MEM</div>
+							<div class="dc-row-4">SCR</div>
+							<div class="dc-row-5">BATT</div>
+						</div>
+						<div class="dc-spacer"></div>
+						<div class="data-column">
+							<div class="dc-row-1" id="dc-sys">ONLINE</div>
+							<div class="dc-row-1" id="dc-mode">READ</div>
+							<div class="dc-row-2" id="dc-chap">00</div>
+							<div class="dc-row-3" id="dc-page">000</div>
+							<div class="dc-row-3">14PT</div>
+							<div class="dc-row-4">NORM</div>
+							<div class="dc-row-5">OFF</div>
+							<div class="dc-row-1" id="dc-time">--:--:--</div>
+							<div class="dc-row-2" id="dc-date">----/--/--</div>
+							<div class="dc-row-3" id="dc-net">---</div>
+							<div class="dc-row-4" id="dc-api">---</div>
+							<div class="dc-row-5" id="dc-dev">---</div>
+							<div class="dc-row-1" id="dc-lat">---</div>
+							<div class="dc-row-2" id="dc-cpu">---</div>
+							<div class="dc-row-3" id="dc-mem">---</div>
+							<div class="dc-row-4" id="dc-scr">---</div>
+							<div class="dc-row-5" id="dc-batt">---</div>
+						</div>
+					</div>				
+						<nav> 
+							<button onclick="playSoundAndRedirect('audio1', 'classic-standard.html')">HOME</button>
+							<button onclick="loadNovelList(); playSound('audio1')">LIST</button>
+							<button onclick="loadSearchPage(); playSound('audio1')">SEARCH</button>
+							<button onclick="loadHotNovels(); playSound('audio1')">HOT</button>
+							<button onclick="loadLatestUpdates(); playSound('audio1')">LATEST</button>
+							<button onclick="playSoundAndRedirect('audio1', 'api-config.html')">API</button>
+						</nav>
+					</div>
+					<div class="bar-panel first-bar-panel">
+						<div class="bar-1"></div>
+						<div class="bar-2"></div>
+						<div class="bar-3"></div>
+						<div class="bar-4"></div>
+						<div class="bar-5"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="wrap" id="gap">
+				<div class="left-frame">
+					<button onclick="topFunction(); playSound('audio3')" id="topBtn"><span class="hop">screen</span> top</button>
+					<div>
+						<div class="panel-3" onclick="playSoundAndRedirect('audio2', 'classic-standard.html')">01<span class="hop">-HOME</span></div>
+						<div class="panel-4" onclick="playSoundAndRedirect('audio2', 'novel-reader.html')">02<span class="hop">-READER</span></div>
+						<div class="panel-5" onclick="playSoundAndRedirect('audio2', 'api-config.html')">03<span class="hop">-API KEY</span></div>
+						<div class="panel-6">04<span class="hop">-HELP</span></div>
+						<div class="panel-7">05<span class="hop">-ABOUT</span></div>
+					</div>
+					<div>
+						<div class="panel-8">06<span class="hop">-CONFIG</span></div>
+						<div class="panel-9">07<span class="hop">-EXIT</span></div>
+						<div class="panel-10">08<span class="hop">-STATUS</span></div>
+					</div>
+				</div>
+				
+				<div class="right-frame">
+					<div class="bar-panel">
+						<div class="bar-6"></div>
+						<div class="bar-7"></div>
+						<div class="bar-8"></div>
+						<div class="bar-9"></div>
+						<div class="bar-10"></div>
+					</div>
+					
+					<main class="reader-content">
+						<div id="loading-indicator" style="display: none;" class="loading-indicator">
+							<h2 class="blink">LOADING NOVEL DATA...</h2>
+							<p>Fetching content from API...</p>
+						</div>
+						
+						<div id="novel-display" style="display: none;">
+							<h1 id="novel-title" class="novel-title"></h1>
+							<div id="author-name" class="author-name"></div>
+							<div id="source-indicator" class="source-indicator source-api">API Data</div>
+							
+							<div class="stats-grid">
+								<div class="stat-box"><span class="label">Words</span><span id="novel-words" class="value">--</span></div>
+							<div class="stat-box"><span class="label">Views</span><span id="novel-views" class="value">--</span></div>
+							<div class="stat-box"><span class="label">Chapters</span><span id="novel-chapters" class="value">--</span></div>
+							<div class="stat-box score-box"><span class="label">Score</span><span id="novel-score" class="value">--</span></div>
+						</div>
+							
+							<div class="tags-section">
+								<div id="novel-tags" class="tags-container"></div>
+							</div>
+							
+							<div id="novel-meta" class="meta-info" style="color: #f80; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(201, 153, 255, 0.3);"></div>
+							
+							<div id="novel-body" class="novel-body"></div>
+						
+						<div class="chapter-navigation">
+							<button id="prev-btn" class="chapter-btn" onclick="loadPrevChapter()">Previous</button>
+							<button class="chapter-btn" onclick="loadNovelList(); playSound('audio1')">Catalog</button>
+							<button id="next-btn" class="chapter-btn" onclick="loadNextChapter()">Next</button>
+						</div>
+						
+						<div id="extra-info-section"></div>
+					</div>
+						
+						<div id="novel-list-section">
+							<h3 class="section-title">Novel Catalog</h3>
+							<div id="catalog-list"></div>
+						</div>
+						
+						<div id="hot-section" style="display: none;">
+							<h3 class="section-title">Hot Novels (Recent 7 Days)</h3>
+							<div id="hot-list"></div>
+						</div>
+						
+						<div id="latest-section" style="display: none;">
+							<h3 class="section-title">Latest Updates</h3>
+							<div id="latest-list"></div>
+						</div>
+						
+						<div id="default-section" style="display: none;">
+							<h3 class="section-title">近日热门 (Hot Novels)</h3>
+							<div id="default-hot-list"></div>
+							
+							<h3 class="section-title" style="margin-top: 2rem;">最近更新 (Latest Updates)</h3>
+							<div id="default-latest-list"></div>
+						</div>
+						
+						<div id="search-section" style="display: none;">
+							<h3 class="section-title">Search Novels</h3>
+							<div class="search-container">
+								<input type="text" id="search-input" placeholder="Enter keyword to search..." class="search-input" onkeydown="if(event.key==='Enter'){performSearch();}">
+								<button onclick="performSearch(); playSound('audio1')" class="search-btn">SEARCH</button>
+							</div>
+							<div id="search-results" class="search-results"></div>
+						</div>
+					</main>
+					
+					<footer>
+						Content &copy; 2024 LCARS Novel Reader<br>
+						LCARS Inspired Website Template by <a href="https://www.thelcars.com">www.TheLCARS.com</a>
+					</footer>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+	<script type="text/javascript" src="assets/lcars.js"></script>
+	<script type="text/javascript" src="assets/novel-api.js?v=20260418e"></script>
+	<script type="text/javascript">
+		/**
+		 * 全局状态变量
+		 */
+		var currentNovelId = null;              // 当前正在阅读的作品/章节ID
+		var novelListData = [];                 // 作品列表数据（用于Catalog显示）
+		var currentNovelData = null;            // 当前作品的完整API数据
+		var currentChapterMenu = [];            // 当前作品的章节目录（Menu数组）
+		var currentChapterIndex = -1;           // 当前章节在Menu中的索引
+		var apiCallCount = 0;                   // API调用次数计数
+		var apiCallStartTime = 0;               // API调用开始时间
+		
+		/**
+		 * 根据API文档优化的作品评分算法
+		 * 综合考虑阅读数、点赞数、收藏数、评论数和点赞率
+		 */
+		function calculateScore(views, upvotes, followers, comments, downvotes) {
+			// Convert all inputs to integers
+			views = parseInt(String(views).replace(/[^\d]/g, '')) || 0;
+			upvotes = parseInt(String(upvotes).replace(/[^\d]/g, '')) || 0;
+			followers = parseInt(String(followers).replace(/[^\d]/g, '')) || 0;
+			comments = parseInt(String(comments).replace(/[^\d]/g, '')) || 0;
+			downvotes = parseInt(String(downvotes).replace(/[^\d]/g, '')) || 0;
+			
+			// Calculate engagement metrics
+			var totalVotes = upvotes + downvotes;
+			var positiveRatio = totalVotes > 0 ? upvotes / totalVotes : 0.5;
+			
+			// Weighted scoring based on API fields
+			// Views: logarithmic scale to prevent popular works from dominating
+			var viewScore = Math.log10(views + 1) * 1.5;
+			
+			// Upvotes: direct measure of quality
+			var upvoteScore = Math.log10(upvotes + 1) * 2.5;
+			
+			// Followers: indicates reader loyalty and interest
+			var followerScore = Math.log10(followers + 1) * 2;
+			
+			// Comments: indicates engagement and discussion
+			var commentScore = Math.log10(comments + 1) * 1.5;
+			
+			// Positive ratio bonus: rewards works with high approval rate
+			var ratioBonus = positiveRatio * 2;
+			
+			// Calculate total score
+			var total = viewScore + upvoteScore + followerScore + commentScore + ratioBonus;
+			
+			// Normalize to 0-10 scale
+			var normalizedScore = Math.min(Math.round(total * 10) / 10, 10);
+			
+			return normalizedScore;
+		}
+		
+		function playSound(audioId) {
+			try {
+				var audio = document.getElementById(audioId);
+				if (audio) {
+					audio.currentTime = 0;
+					audio.play().catch(function() {});
+				}
+			} catch(e) {}
+		}
+		
+		function playSoundAndRedirect(audioId, url) {
+			try {
+				var audio = document.getElementById(audioId);
+				if (audio) {
+					audio.play().catch(function() {});
+					audio.onended = function() {
+						window.location.href = url;
+					};
+				} else {
+					window.location.href = url;
+				}
+			} catch(e) {
+				window.location.href = url;
+			}
+		}
+		
+		function updateStatusDisplay() {
+			var apiStatusText = document.getElementById('api-status-text');
+			var sysStatus = document.getElementById('sys-status');
+			var userText = document.getElementById('user-text');
+			var dcSys = document.getElementById('dc-sys');
+			
+			if (NovelAPI.hasCredentials()) {
+				apiStatusText.textContent = 'API: Configured';
+				apiStatusText.style.color = '#6c6';
+				sysStatus.textContent = 'System: Online';
+				userText.textContent = 'User: Authenticated';
+				userText.style.color = '#6c6';
+				dcSys.textContent = 'ONLINE';
+				dcSys.style.color = '#6c6';
+			} else {
+				apiStatusText.textContent = 'API: Not Config';
+				apiStatusText.style.color = '#c66';
+				sysStatus.textContent = 'System: Limited';
+				userText.textContent = 'User: Guest';
+				userText.style.color = '#f80';
+				dcSys.textContent = 'LIMITED';
+				dcSys.style.color = '#f80';
+			}
+		}
+		
+		async function testAPIConnection() {
+			if (!NovelAPI.hasCredentials()) {
+				alert('Please configure API Key and API Pass first');
+				return;
+			}
+			
+			try {
+				var result = await NovelAPI.testConnection();
+				if (result.success) {
+					alert('API connection successful!\n\nResponse preview:\n' + JSON.stringify(result.data).substring(0, 500) + '...');
+				} else {
+					alert('API connection failed: ' + result.error);
+				}
+			} catch (error) {
+				alert('API connection failed: ' + error.message);
+			}
+		}
+		
+		async function displayNovelData(novelId) {
+			// 设置当前作品ID并显示加载指示器
+			currentNovelId = novelId;
+			document.getElementById('loading-indicator').style.display = 'block';
+			document.getElementById('novel-display').style.display = 'none';
+			document.getElementById('novel-list-section').style.display = 'none';
+			document.getElementById('hot-section').style.display = 'none';
+			document.getElementById('latest-section').style.display = 'none';
+			
+			// 更新数据流显示
+			var dcChap = document.getElementById('dc-chap');
+			dcChap.textContent = novelId;
+			
+			try {
+				if (NovelAPI.hasCredentials()) {
+					console.log('Fetching novel data from API...');
+					console.log('Novel ID:', novelId);
+					
+					var novelData = await NovelAPI.getNovel(novelId);
+					console.log('API Response:', novelData);
+					
+					currentNovelData = novelData;
+					
+					// According to API docs, topic page returns TopicInfo
+					var topicInfo = novelData.TopicInfo || novelData;
+					
+					// Extract all fields according to API documentation
+					var title = topicInfo.Title || "Unknown Novel";
+					var author = topicInfo.UserName || "Unknown Author";
+					var isChapter = topicInfo.IsChapter || false;
+					var date = topicInfo.DateUpdated ? new Date(topicInfo.DateUpdated * 1000).toLocaleDateString() : (topicInfo.DateCreated ? new Date(topicInfo.DateCreated * 1000).toLocaleDateString() : "Unknown Date");
+					var content = topicInfo.Content || '';
+					var words = topicInfo.WordCount || 0;
+					var views = topicInfo.Views || 0;
+					var rating = '--';
+					var favorites = topicInfo.Followers || 0;
+					var likes = topicInfo.Upvotes || 0;
+					var downvotes = topicInfo.Downvotes || 0;
+					var comments = topicInfo.Comments || 0;
+					var tags = topicInfo.Tags || {};
+					var chapterCount = topicInfo.ChapterCount || 0;
+					var lastChapterID = topicInfo.LastChapterID || null;
+					var intro = topicInfo.Intro || '';
+					var background = topicInfo.Background || null;
+					
+					// Extract additional data for chapter navigation and related content
+					var menu = novelData.Menu || [];
+					var prequelInfo = novelData.PrequelInfo || null;
+					var sequelInfo = novelData.SequelInfo || [];
+					var recommendWords = novelData.RecommendWords || [];
+					var channelsInvolved = novelData.ChannelsInvolved || [];
+					
+					// Set chapter menu and find current chapter index
+					currentChapterMenu = menu;
+					currentChapterIndex = -1;
+					for (var i = 0; i < menu.length; i++) {
+						if (String(menu[i].ID) === String(novelId)) {
+							currentChapterIndex = i;
+							break;
+						}
+					}
+					
+					// Update page display
+					var dcPage = document.getElementById('dc-page');
+					if (currentChapterIndex >= 0) {
+						dcPage.textContent = String(currentChapterIndex + 1).padStart(3, '0');
+					} else {
+						dcPage.textContent = '001';
+					}
+					
+					// Calculate score based on API fields: views, upvotes, followers, comments, downvotes
+					var score = calculateScore(views, likes, favorites, comments, downvotes);
+					
+					// Build meta information string
+					var metaInfo = '';
+					if (isChapter) {
+						metaInfo = '<span>Chapter</span> &nbsp;|&nbsp; ';
+					} else if (chapterCount > 0) {
+						metaInfo = '<span>' + chapterCount + ' Chapters</span> &nbsp;|&nbsp; ';
+					}
+					metaInfo += '<span>Date: ' + date + '</span>';
+					if (likes > 0 || downvotes > 0) {
+						var upvotePercent = likes + downvotes > 0 ? Math.round(likes / (likes + downvotes) * 100) : 0;
+						metaInfo += ' &nbsp;|&nbsp; <span>👍 ' + upvotePercent + '%</span>';
+					}
+					
+					// Update display elements
+					document.getElementById('novel-title').textContent = title;
+					document.getElementById('author-name').textContent = 'by ' + author;
+					document.getElementById('source-indicator').textContent = 'API Data';
+					document.getElementById('source-indicator').className = 'source-indicator source-api';
+					document.getElementById('novel-meta').innerHTML = metaInfo;
+					document.getElementById('novel-words').textContent = words;
+				document.getElementById('novel-views').textContent = views;
+				document.getElementById('novel-chapters').textContent = chapterCount > 0 ? chapterCount : (isChapter ? '1' : '--');
+				document.getElementById('novel-score').textContent = score.toFixed(1);
+					
+					// Render tags
+					var tagsContainer = document.getElementById('novel-tags');
+					tagsContainer.innerHTML = '';
+					if (tags && typeof tags === 'object') {
+						var tagValues = [];
+						if (tags.Type) tagValues.push('Type: ' + tags.Type);
+						if (tags.Length) tagValues.push('Length: ' + tags.Length);
+						if (tags.Source) tagValues.push('Source: ' + tags.Source);
+						if (tags.Rating) tagValues.push('Rating: ' + tags.Rating);
+						if (tags.Status) tagValues.push('Status: ' + tags.Status);
+						if (tags.OtherTags && Array.isArray(tags.OtherTags)) {
+							tags.OtherTags.forEach(function(t) { tagValues.push(t); });
+						}
+						
+						tagValues.forEach(function(tag) {
+							var tagSpan = document.createElement('span');
+							tagSpan.className = 'tag';
+							tagSpan.textContent = tag;
+							tagsContainer.appendChild(tagSpan);
+						});
+					}
+					
+					// Render content (HTML format as per API docs)
+					var contentDiv = document.getElementById('novel-body');
+					contentDiv.innerHTML = '';
+					if (content) {
+						// Content is in HTML format according to API docs
+						contentDiv.innerHTML = content;
+					} else {
+						var p = document.createElement('p');
+						p.textContent = 'No content available for this chapter.';
+						contentDiv.appendChild(p);
+					}
+					
+					// Update chapter navigation button states
+					updateChapterNavButtons();
+					
+					// Display extra info (menu, prequel/sequel, recommendations, channels)
+					displayExtraInfo(menu, prequelInfo, sequelInfo, recommendWords, channelsInvolved, topicInfo, novelId);
+					
+					// Scroll to top after loading new chapter
+					window.scrollTo({ top: 0, behavior: 'smooth' });
+				} else {
+					console.log('No API credentials configured');
+					displayMockData(novelId);
+				}
+				
+			} catch (error) {
+				console.error('API call failed:', error);
+				displayMockData(novelId, error.message);
+			}
+			
+			document.getElementById('loading-indicator').style.display = 'none';
+			document.getElementById('novel-display').style.display = 'block';
+		}
+		
+		function displayExtraInfo(menu, prequelInfo, sequelInfo, recommendWords, channelsInvolved, topicInfo, novelId) {
+			var extraSection = document.getElementById('extra-info-section');
+			extraSection.innerHTML = '';
+			
+			var hasContent = false;
+			
+			if (menu && menu.length > 0) {
+				hasContent = true;
+				var menuDiv = document.createElement('div');
+				menuDiv.className = 'extra-section';
+				
+				var menuTitle = document.createElement('h3');
+				menuTitle.className = 'section-title';
+				menuTitle.textContent = 'Table of Contents (' + menu.length + ' chapters)';
+				menuDiv.appendChild(menuTitle);
+				
+				var menuList = document.createElement('div');
+				menu.forEach(function(chapter) {
+					var item = document.createElement('div');
+					item.className = 'menu-item';
+					if (String(chapter.ID) === String(novelId)) {
+						item.className += ' active';
+					}
+					
+					var titleSpan = document.createElement('span');
+					titleSpan.className = 'menu-title';
+					titleSpan.textContent = chapter.Title || 'Untitled';
+					
+					var metaSpan = document.createElement('span');
+					metaSpan.className = 'menu-meta';
+					var meta = [];
+					if (chapter.IsChapter) meta.push('Chapter');
+					if (chapter.WordCount) meta.push(chapter.WordCount + ' words');
+					if (chapter.DateUpdated) meta.push(new Date(chapter.DateUpdated * 1000).toLocaleDateString());
+					metaSpan.textContent = meta.join(' | ');
+					
+					item.appendChild(titleSpan);
+					item.appendChild(metaSpan);
+					item.onclick = function() {
+						playSound('audio1');
+						displayNovelData(chapter.ID);
+					};
+					
+					menuList.appendChild(item);
+				});
+				
+				menuDiv.appendChild(menuList);
+				extraSection.appendChild(menuDiv);
+			}
+			
+			if (prequelInfo) {
+				hasContent = true;
+				var prequelDiv = document.createElement('div');
+				prequelDiv.className = 'extra-section';
+				
+				var prequelTitle = document.createElement('h3');
+				prequelTitle.className = 'section-title';
+				prequelTitle.textContent = 'Prequel';
+				prequelDiv.appendChild(prequelTitle);
+				
+				var prequelItem = document.createElement('div');
+				prequelItem.className = 'prequel-item';
+				
+				var prequelName = document.createElement('div');
+				prequelName.className = 'menu-title';
+				prequelName.textContent = prequelInfo.Title || 'Unknown';
+				
+				var prequelMeta = document.createElement('div');
+				prequelMeta.className = 'menu-meta';
+				var prequelMetaArr = [];
+				if (prequelInfo.UserName) prequelMetaArr.push(prequelInfo.UserName);
+				if (prequelInfo.Views) prequelMetaArr.push(prequelInfo.Views + ' views');
+				prequelMeta.textContent = prequelMetaArr.join(' | ');
+				
+				prequelItem.appendChild(prequelName);
+				prequelItem.appendChild(prequelMeta);
+				prequelItem.onclick = function() {
+					playSound('audio1');
+					displayNovelData(prequelInfo.ID);
+				};
+				
+				prequelDiv.appendChild(prequelItem);
+				extraSection.appendChild(prequelDiv);
+			}
+			
+			if (sequelInfo && sequelInfo.length > 0) {
+				hasContent = true;
+				var sequelDiv = document.createElement('div');
+				sequelDiv.className = 'extra-section';
+				
+				var sequelTitle = document.createElement('h3');
+				sequelTitle.className = 'section-title';
+				sequelTitle.textContent = 'Sequels (' + sequelInfo.length + ')';
+				sequelDiv.appendChild(sequelTitle);
+				
+				var sequelList = document.createElement('div');
+				sequelInfo.forEach(function(sequel) {
+					var item = document.createElement('div');
+					item.className = 'sequel-item';
+					
+					var sequelName = document.createElement('div');
+					sequelName.className = 'menu-title';
+					sequelName.textContent = sequel.Title || 'Unknown';
+					
+					var sequelMeta = document.createElement('div');
+					sequelMeta.className = 'menu-meta';
+					var sequelMetaArr = [];
+					if (sequel.UserName) sequelMetaArr.push(sequel.UserName);
+					if (sequel.Views) sequelMetaArr.push(sequel.Views + ' views');
+					sequelMeta.textContent = sequelMetaArr.join(' | ');
+					
+					item.appendChild(sequelName);
+					item.appendChild(sequelMeta);
+					item.onclick = function() {
+						playSound('audio1');
+						displayNovelData(sequel.ID);
+					};
+					
+					sequelList.appendChild(item);
+				});
+				
+				sequelDiv.appendChild(sequelList);
+				extraSection.appendChild(sequelDiv);
+			}
+			
+			if (recommendWords && recommendWords.length > 0) {
+				hasContent = true;
+				var recommendDiv = document.createElement('div');
+				recommendDiv.className = 'extra-section';
+				
+				var recommendTitle = document.createElement('h3');
+				recommendTitle.className = 'section-title';
+				recommendTitle.textContent = 'Editor Recommendations';
+				recommendDiv.appendChild(recommendTitle);
+				
+				recommendWords.forEach(function(rec) {
+					var item = document.createElement('div');
+					item.className = 'recommend-item';
+					
+					var word = document.createElement('div');
+					word.className = 'recommend-word';
+					word.textContent = '"' + (rec.RecommendWord || '') + '"';
+					
+					var meta = document.createElement('div');
+					meta.className = 'recommend-meta';
+					var metaArr = [];
+					if (rec.RecommenderName) metaArr.push('By: ' + rec.RecommenderName);
+					if (rec.RecommendTime) metaArr.push(new Date(rec.RecommendTime * 1000).toLocaleDateString());
+					meta.textContent = metaArr.join(' | ');
+					
+					item.appendChild(word);
+					item.appendChild(meta);
+					item.onclick = function() {
+						playSound('audio1');
+						displayNovelData(rec.ID);
+					};
+					
+					recommendDiv.appendChild(item);
+				});
+				
+				extraSection.appendChild(recommendDiv);
+			}
+			
+			if (channelsInvolved && channelsInvolved.length > 0) {
+				hasContent = true;
+				var channelDiv = document.createElement('div');
+				channelDiv.className = 'extra-section';
+				
+				var channelTitle = document.createElement('h3');
+				channelTitle.className = 'section-title';
+				channelTitle.textContent = 'Channels (' + channelsInvolved.length + ')';
+				channelDiv.appendChild(channelTitle);
+				
+				var channelList = document.createElement('div');
+				channelsInvolved.forEach(function(channel) {
+					var item = document.createElement('div');
+					item.className = 'channel-item';
+					
+					var nameSpan = document.createElement('span');
+					nameSpan.className = 'channel-name';
+					nameSpan.textContent = channel.Name || 'Unknown';
+					
+					item.appendChild(nameSpan);
+					item.onclick = function() {
+						playSound('audio1');
+					};
+					
+					channelList.appendChild(item);
+				});
+				
+				channelDiv.appendChild(channelList);
+				extraSection.appendChild(channelDiv);
+			}
+		}
+		
+		function displayMockData(novelId, apiError) {
+			var mockNovels = {
+				'76448': { title: 'Selected Works', author: 'Popular Author', words: '52,000', views: '10000', rating: '4.9', favorites: '512', likes: '2341', comments: '156' },
+				'18405': { title: 'Starlight Chronicle', author: 'Star Walker', words: '156,000', views: '326027', rating: '4.9', favorites: '3210', likes: '15632', comments: '890' },
+				'18406': { title: 'Void Echo', author: 'Chen Mo', words: '89,000', views: '156890', rating: '4.8', favorites: '1890', likes: '8765', comments: '456' },
+				'18407': { title: 'The Last Dragon Prince', author: 'Meng Xi', words: '72,000', views: '89456', rating: '4.7', favorites: '1234', likes: '5432', comments: '234' },
+				'18408': { title: 'Abyss Whispers', author: 'Dark Wanderer', words: '65,000', views: '67234', rating: '4.6', favorites: '890', likes: '3210', comments: '178' },
+				'4': { title: 'Test Novel', author: 'Test Author', words: '15,000', views: '12345', rating: '4.0', favorites: '123', likes: '567', comments: '45' }
+			};
+			
+			var novel = mockNovels[novelId] || mockNovels['76448'];
+			var score = calculateScore(novel.views, novel.likes, novel.favorites, novel.comments, novel.downvotes || 0);
+			
+			document.getElementById('novel-title').textContent = novel.title;
+			document.getElementById('author-name').textContent = 'by ' + novel.author;
+			
+			if (apiError) {
+				document.getElementById('source-indicator').textContent = 'Mock Data (API Failed)';
+				document.getElementById('source-indicator').className = 'source-indicator source-mock';
+				document.getElementById('novel-display').insertAdjacentHTML('afterbegin', 
+					'<div class="error-message">API Error: ' + apiError + '</div>'
+				);
+			} else {
+				document.getElementById('source-indicator').textContent = 'Mock Data (No API)';
+				document.getElementById('source-indicator').className = 'source-indicator source-mock';
+			}
+			
+			document.getElementById('novel-meta').innerHTML = '<span>Chapter: Chapter 1</span> &nbsp;|&nbsp; <span>Date: 2024-01-15</span>';
+			document.getElementById('novel-words').textContent = novel.words;
+			document.getElementById('novel-views').textContent = novel.views;
+			document.getElementById('novel-chapters').textContent = '--';
+			document.getElementById('novel-score').textContent = score + ' / 10';
+			
+			var tagsContainer = document.getElementById('novel-tags');
+			tagsContainer.innerHTML = '';
+			['Fantasy', 'Adventure', 'Sci-Fi'].forEach(function(tag) {
+				var tagSpan = document.createElement('span');
+				tagSpan.className = 'tag';
+				tagSpan.textContent = tag;
+				tagsContainer.appendChild(tagSpan);
+			});
+			
+			document.getElementById('novel-body').innerHTML = '<p>This is the first chapter of the novel. The protagonist begins his adventure journey here. The story takes place on a distant planet, full of mystery and unknown challenges.</p><p>As the plot develops, the protagonist will face various trials and choices. Each choice will affect the direction and ending of the story.</p><p>In this imaginative world, readers will follow the protagonist to explore unknown areas, solve puzzles one by one, and discover hidden secrets.</p>';
+		}
+		
+		function loadNovelList() {
+			document.getElementById('novel-display').style.display = 'none';
+			document.getElementById('novel-list-section').style.display = 'block';
+			document.getElementById('hot-section').style.display = 'none';
+			document.getElementById('latest-section').style.display = 'none';
+			
+			document.getElementById('dc-mode').textContent = 'LIST';
+			
+			novelListData = [
+				{ id: '76448', title: 'Selected Works', author: 'Unknown Author', rating: '5.0', views: '10000+' },
+				{ id: '18405', title: 'Starlight Chronicle', author: 'Star Walker', rating: '4.9', views: '326,027' },
+				{ id: '18406', title: 'Void Echo', author: 'Chen Mo', rating: '4.8', views: '156,890' },
+				{ id: '18407', title: 'The Last Dragon Prince', author: 'Meng Xi', rating: '4.7', views: '89,456' },
+				{ id: '18408', title: 'Abyss Whispers', author: 'Dark Wanderer', rating: '4.6', views: '67,234' },
+				{ id: '4', title: 'Test Novel', author: 'Test Author', rating: '4.0', views: '12,345' }
+			];
+			
+			var list = document.getElementById('catalog-list');
+			list.innerHTML = '';
+			novelListData.forEach(function(novel) {
+				var div = document.createElement('div');
+				div.className = 'novel-list-item';
+				div.innerHTML = '<span class="title">' + novel.title + '</span><span class="meta">' + novel.author + ' | ' + novel.rating + ' Rating | ' + novel.views + ' Views</span>';
+				div.onclick = function() { displayNovelData(novel.id); };
+				list.appendChild(div);
+			});
+		}
+		
+		/**
+		 * 加载搜索页面
+		 */
+		function loadSearchPage() {
+			document.getElementById('novel-display').style.display = 'none';
+			document.getElementById('novel-list-section').style.display = 'none';
+			document.getElementById('hot-section').style.display = 'none';
+			document.getElementById('latest-section').style.display = 'none';
+			document.getElementById('default-section').style.display = 'none';
+			document.getElementById('search-section').style.display = 'block';
+			
+			document.getElementById('dc-mode').textContent = 'SEARCH';
+			
+			var searchInput = document.getElementById('search-input');
+			searchInput.value = '';
+			searchInput.focus();
+			
+			document.getElementById('search-results').innerHTML = '<div class="search-placeholder">Enter keywords to search for novels, then press Enter or click SEARCH</div>';
+		}
+		
+		/**
+		 * 执行搜索操作
+		 */
+		async function performSearch() {
+			var keyword = document.getElementById('search-input').value.trim();
+			
+			if (!keyword) {
+				alert('Please enter a search keyword');
+				return;
+			}
+			
+			var resultsDiv = document.getElementById('search-results');
+			resultsDiv.innerHTML = '<div class="loading-indicator"><p class="blink">Searching...</p></div>';
+			
+			try {
+				if (NovelAPI.hasCredentials()) {
+					// Use the search API endpoint
+					var searchData = await NovelAPI.searchNovels(keyword);
+					console.log('Search results:', searchData);
+					
+					if (searchData && searchData.TopicArray && searchData.TopicArray.length > 0) {
+						var results = searchData.TopicArray;
+						resultsDiv.innerHTML = '';
+						
+						results.forEach(function(topic) {
+							var score = calculateScore(topic.Views || 0, topic.Upvotes || 0, topic.Followers || 0, topic.Comments || 0, topic.Downvotes || 0);
+							
+							var div = document.createElement('div');
+							div.className = 'search-result-item';
+							
+							var infoDiv = document.createElement('div');
+							infoDiv.style.flex = '1';
+							
+							var titleDiv = document.createElement('div');
+							titleDiv.className = 'search-result-title';
+							titleDiv.textContent = topic.Title || 'Unknown';
+							
+							var metaDiv = document.createElement('div');
+							metaDiv.className = 'search-result-meta';
+							var metaParts = [];
+							if (topic.UserName) metaParts.push('by ' + topic.UserName);
+							if (topic.Views) metaParts.push(topic.Views + ' views');
+							if (topic.WordCount) metaParts.push(topic.WordCount + ' words');
+							metaDiv.textContent = metaParts.join(' | ');
+							
+							infoDiv.appendChild(titleDiv);
+							infoDiv.appendChild(metaDiv);
+							
+							var scoreDiv = document.createElement('div');
+							scoreDiv.className = 'search-result-score';
+							scoreDiv.textContent = score.toFixed(1);
+							
+							div.appendChild(infoDiv);
+							div.appendChild(scoreDiv);
+							
+							div.onclick = function() {
+								playSound('audio1');
+								displayNovelData(topic.ID);
+							};
+							
+							resultsDiv.appendChild(div);
+						});
+					} else {
+						resultsDiv.innerHTML = '<div class="search-placeholder">No results found for "' + keyword + '"</div>';
+					}
+				} else {
+					resultsDiv.innerHTML = '<div class="error-message">Please configure API credentials to use search</div>';
+				}
+			} catch (error) {
+				console.error('Search failed:', error);
+				resultsDiv.innerHTML = '<div class="error-message">Search failed: ' + error.message + '</div>';
+			}
+		}
+		
+		async function loadHotNovels() {
+			document.getElementById('novel-display').style.display = 'none';
+			document.getElementById('novel-list-section').style.display = 'none';
+			document.getElementById('hot-section').style.display = 'block';
+			document.getElementById('latest-section').style.display = 'none';
+			
+			document.getElementById('dc-mode').textContent = 'HOT';
+			
+			var hotList = document.getElementById('hot-list');
+			hotList.innerHTML = '<div class="loading-indicator"><p class="blink">Loading hot novels...</p></div>';
+			
+			var novelDataList = [];
+			
+			if (NovelAPI.hasCredentials()) {
+				try {
+					var homeData = await NovelAPI.getHomePage();
+					console.log('Home page data:', homeData);
+					
+					if (homeData && homeData.NewlyPostTopicArray) {
+						homeData.NewlyPostTopicArray.forEach(function(topic) {
+							novelDataList.push({
+								id: topic.ID,
+								title: topic.Title || 'Unknown',
+								author: topic.UserName || 'Unknown',
+								views: topic.Views || 0,
+								likes: topic.Upvotes || 0,
+								favorites: topic.Followers || 0,
+								comments: topic.Comments || 0,
+								tags: topic.Tags || [],
+								wordCount: topic.WordCount || 0,
+								intro: topic.Intro || ''
+							});
+						});
+					}
+				} catch (e) {
+					console.error('Failed to load home page data:', e);
+				}
+			}
+			
+			if (novelDataList.length === 0) {
+				displayMockHotNovels();
+				return;
+			}
+			
+			novelDataList.sort(function(a, b) {
+				var scoreA = calculateScore(a.views || 0, a.likes || 0, a.favorites || 0, a.comments || 0, a.downvotes || 0);
+				var scoreB = calculateScore(b.views || 0, b.likes || 0, b.favorites || 0, b.comments || 0, b.downvotes || 0);
+				return scoreB - scoreA;
+			});
+			
+			hotList.innerHTML = '';
+			novelDataList.forEach(function(novel, index) {
+				var score = calculateScore(novel.views || 0, novel.likes || 0, novel.favorites || 0, novel.comments || 0, novel.downvotes || 0);
+				var div = document.createElement('div');
+				div.className = 'hot-item';
+				div.innerHTML = '<div class="hot-rank">' + (index + 1) + '</div><div><div class="hot-title">' + novel.title + '<span class="source-indicator source-api" style="margin-left:1rem;">' + score + ' / 10</span></div><div class="hot-meta">' + novel.author + ' | ' + novel.views + ' Views | ' + novel.wordCount + ' Words</div></div>';
+				div.onclick = function() { displayNovelData(novel.id); };
+				hotList.appendChild(div);
+			});
+		}
+		
+		function displayMockHotNovels() {
+			var hotData = [
+				{ id: '18405', title: 'Starlight Chronicle', author: 'Star Walker', views: '326,027', likes: '15632', favorites: '3210', comments: '890' },
+				{ id: '18406', title: 'Void Echo', author: 'Chen Mo', views: '156,890', likes: '8765', favorites: '1890', comments: '456' },
+				{ id: '76448', title: 'Selected Works', author: 'Popular Author', views: '10000+', likes: '2341', favorites: '512', comments: '156' },
+				{ id: '18407', title: 'The Last Dragon Prince', author: 'Meng Xi', views: '89,456', likes: '5432', favorites: '1234', comments: '234' },
+				{ id: '18408', title: 'Abyss Whispers', author: 'Dark Wanderer', views: '67,234', likes: '3210', favorites: '890', comments: '178' }
+			];
+			
+			hotData.sort(function(a, b) {
+				var scoreA = calculateScore(a.views, a.likes, a.favorites, a.comments, a.downvotes || 0);
+				var scoreB = calculateScore(b.views, b.likes, b.favorites, b.comments, b.downvotes || 0);
+				return scoreB - scoreA;
+			});
+			
+			var hotList = document.getElementById('hot-list');
+			hotList.innerHTML = '';
+			hotData.forEach(function(item, index) {
+				var score = calculateScore(item.views, item.likes, item.favorites, item.comments, item.downvotes || 0);
+				var div = document.createElement('div');
+				div.className = 'hot-item';
+				div.innerHTML = '<div class="hot-rank">' + (index + 1) + '</div><div><div class="hot-title">' + item.title + '<span class="source-indicator source-mock" style="margin-left:1rem;">' + score + ' / 10</span></div><div class="hot-meta">' + item.author + ' | ' + item.views + ' Views</div></div>';
+				div.onclick = function() { displayNovelData(item.id); };
+				hotList.appendChild(div);
+			});
+		}
+		
+		async function loadLatestUpdates() {
+			document.getElementById('novel-display').style.display = 'none';
+			document.getElementById('novel-list-section').style.display = 'none';
+			document.getElementById('hot-section').style.display = 'none';
+			document.getElementById('latest-section').style.display = 'block';
+			
+			document.getElementById('dc-mode').textContent = 'LATEST';
+			
+			var latestList = document.getElementById('latest-list');
+			latestList.innerHTML = '<div class="loading-indicator"><p class="blink">Loading latest updates...</p></div>';
+			
+			var novelDataList = [];
+			
+			if (NovelAPI.hasCredentials()) {
+				try {
+					var homeData = await NovelAPI.getHomePage();
+					console.log('Home page data for latest:', homeData);
+					
+					if (homeData && homeData.NewlyUpdateTopicArray) {
+						homeData.NewlyUpdateTopicArray.forEach(function(topic) {
+							novelDataList.push({
+								id: topic.ID,
+								title: topic.Title || 'Unknown',
+								author: topic.UserName || 'Unknown',
+								date: topic.DateUpdated ? new Date(topic.DateUpdated * 1000).toLocaleDateString() : 'Recently',
+								wordCount: topic.WordCount || 0
+							});
+						});
+					}
+				} catch (e) {
+					console.error('Failed to load home page data:', e);
+				}
+			}
+			
+			if (novelDataList.length === 0) {
+				displayMockLatestUpdates();
+				return;
+			}
+			
+			latestList.innerHTML = '';
+			novelDataList.forEach(function(novel) {
+				var div = document.createElement('div');
+				div.className = 'novel-list-item';
+				div.innerHTML = '<span class="title">' + novel.title + '</span><span class="meta">' + novel.author + ' | Updated: ' + novel.date + ' | ' + novel.wordCount + ' Words</span>';
+				div.onclick = function() { displayNovelData(novel.id); };
+				latestList.appendChild(div);
+			});
+		}
+		
+		function displayMockLatestUpdates() {
+			var latestData = [
+				{ id: '76448', title: 'Selected Works - New Chapter', author: 'Popular Author', updateTime: '10 minutes ago' },
+				{ id: '18405', title: 'Starlight Chronicle - Chapter 42', author: 'Star Walker', updateTime: '1 hour ago' },
+				{ id: '18406', title: 'Void Echo - Chapter 18', author: 'Chen Mo', updateTime: '3 hours ago' },
+				{ id: '18407', title: 'The Last Dragon Prince - Final Chapter', author: 'Meng Xi', updateTime: '5 hours ago' },
+				{ id: '18408', title: 'Abyss Whispers - Chapter 15', author: 'Dark Wanderer', updateTime: 'Yesterday' }
+			];
+			
+			var list = document.getElementById('latest-list');
+			list.innerHTML = '';
+			latestData.forEach(function(item) {
+				var div = document.createElement('div');
+				div.className = 'novel-list-item';
+				div.innerHTML = '<span class="title">' + item.title + '</span><span class="meta">' + item.author + ' | Updated ' + item.updateTime + '</span>';
+				div.onclick = function() { displayNovelData(item.id); };
+				list.appendChild(div);
+			});
+		}
+		
+		/**
+		 * 更新章节导航按钮的状态（启用/禁用和文本）
+		 */
+		function updateChapterNavButtons() {
+			var prevBtn = document.getElementById('prev-btn');
+			var nextBtn = document.getElementById('next-btn');
+			
+			// Check if we have chapter menu data
+			if (currentChapterMenu && currentChapterMenu.length > 0 && currentChapterIndex >= 0) {
+				// Enable/disable previous button based on current position
+				if (currentChapterIndex > 0) {
+					prevBtn.disabled = false;
+					var prevChapter = currentChapterMenu[currentChapterIndex - 1];
+					prevBtn.textContent = '← ' + (prevChapter.Title || 'Previous');
+				} else {
+					prevBtn.disabled = true;
+					prevBtn.textContent = '← First Chapter';
+				}
+				
+				// Enable/disable next button based on current position
+				if (currentChapterIndex < currentChapterMenu.length - 1) {
+					nextBtn.disabled = false;
+					var nextChapter = currentChapterMenu[currentChapterIndex + 1];
+					nextBtn.textContent = (nextChapter.Title || 'Next') + ' →';
+				} else {
+					nextBtn.disabled = true;
+					nextBtn.textContent = 'Last Chapter →';
+				}
+			} else {
+				// Fallback when no menu data is available
+				prevBtn.disabled = false;
+				prevBtn.textContent = '← Previous';
+				nextBtn.disabled = false;
+				nextBtn.textContent = 'Next →';
+			}
+		}
+		
+		/**
+		 * 加载上一章节 - 使用Menu数据进行导航
+		 */
+		function loadPrevChapter() {
+			if (!currentNovelId) {
+				alert('Please select a novel first');
+				return;
+			}
+			
+			// Use chapter menu for navigation if available
+			if (currentChapterMenu && currentChapterMenu.length > 0 && currentChapterIndex >= 0) {
+				if (currentChapterIndex > 0) {
+					var prevChapter = currentChapterMenu[currentChapterIndex - 1];
+					playSound('audio1');
+					displayNovelData(prevChapter.ID);
+				} else {
+					alert('This is the first chapter');
+				}
+			} else {
+				// Fallback: use novel list data if menu is not available
+				if (currentNovelId) {
+					var currentIndex = -1;
+					for (var i = 0; i < novelListData.length; i++) {
+						if (novelListData[i].id === currentNovelId) {
+							currentIndex = i;
+							break;
+						}
+					}
+					
+					if (currentIndex > 0) {
+						playSound('audio1');
+						displayNovelData(novelListData[currentIndex - 1].id);
+					} else if (novelListData.length === 0) {
+						alert('Please load novel catalog first');
+					} else {
+						alert('This is the first chapter');
+					}
+				}
+			}
+		}
+		
+		/**
+		 * 加载下一章节 - 使用Menu数据进行导航
+		 */
+		function loadNextChapter() {
+			if (!currentNovelId) {
+				alert('Please select a novel first');
+				return;
+			}
+			
+			// Use chapter menu for navigation if available
+			if (currentChapterMenu && currentChapterMenu.length > 0 && currentChapterIndex >= 0) {
+				if (currentChapterIndex < currentChapterMenu.length - 1) {
+					var nextChapter = currentChapterMenu[currentChapterIndex + 1];
+					playSound('audio1');
+					displayNovelData(nextChapter.ID);
+				} else {
+					alert('This is the last chapter');
+				}
+			} else {
+				// Fallback: use novel list data if menu is not available
+				if (currentNovelId) {
+					var currentIndex = -1;
+					for (var i = 0; i < novelListData.length; i++) {
+						if (novelListData[i].id === currentNovelId) {
+							currentIndex = i;
+							break;
+						}
+					}
+					
+					if (currentIndex >= 0 && currentIndex < novelListData.length - 1) {
+						playSound('audio1');
+						displayNovelData(novelListData[currentIndex + 1].id);
+					} else if (novelListData.length === 0) {
+						alert('Please load novel catalog first');
+					} else {
+						alert('This is the last chapter');
+					}
+				}
+			}
+		}
+		
+		/**
+		 * 默认显示：同时加载近日热门和最近更新
+		 */
+		async function loadDefaultView() {
+			document.getElementById('novel-display').style.display = 'none';
+			document.getElementById('novel-list-section').style.display = 'none';
+			document.getElementById('hot-section').style.display = 'none';
+			document.getElementById('latest-section').style.display = 'none';
+			document.getElementById('default-section').style.display = 'block';
+			
+			document.getElementById('dc-mode').textContent = 'HOME';
+			
+			var hotListDiv = document.getElementById('default-hot-list');
+			var latestListDiv = document.getElementById('default-latest-list');
+			
+			hotListDiv.innerHTML = '<div class="loading-indicator"><p class="blink">Loading...</p></div>';
+			latestListDiv.innerHTML = '<div class="loading-indicator"><p class="blink">Loading...</p></div>';
+			
+			if (NovelAPI.hasCredentials()) {
+				try {
+					var homeData = await NovelAPI.getHomePage();
+					console.log('Home page data:', homeData);
+					
+					if (homeData && homeData.NewlyPostTopicArray) {
+						var hotNovels = [];
+						homeData.NewlyPostTopicArray.forEach(function(topic) {
+							hotNovels.push({
+								id: topic.ID,
+								title: topic.Title || 'Unknown',
+								author: topic.UserName || 'Unknown',
+								views: topic.Views || 0,
+								likes: topic.Upvotes || 0,
+								favorites: topic.Followers || 0,
+								comments: topic.Comments || 0,
+								downvotes: topic.Downvotes || 0,
+								tags: topic.Tags || [],
+								wordCount: topic.WordCount || 0,
+								intro: topic.Intro || ''
+							});
+						});
+						
+						hotNovels.sort(function(a, b) {
+							var scoreA = calculateScore(a.views || 0, a.likes || 0, a.favorites || 0, a.comments || 0, a.downvotes || 0);
+							var scoreB = calculateScore(b.views || 0, b.likes || 0, b.favorites || 0, b.comments || 0, b.downvotes || 0);
+							return scoreB - scoreA;
+						});
+						
+						hotListDiv.innerHTML = '';
+						hotNovels.forEach(function(novel, index) {
+							var score = calculateScore(novel.views || 0, novel.likes || 0, novel.favorites || 0, novel.comments || 0, novel.downvotes || 0);
+							var div = document.createElement('div');
+							div.className = 'hot-item';
+							div.innerHTML = '<div class="hot-rank">' + (index + 1) + '</div><div><div class="hot-title">' + novel.title + '<span class="source-indicator source-api" style="margin-left:1rem;">' + score.toFixed(1) + '</span></div><div class="hot-meta">' + novel.author + ' | ' + novel.views + ' Views | ' + novel.wordCount + ' Words</div></div>';
+							div.onclick = function() { displayNovelData(novel.id); };
+							hotListDiv.appendChild(div);
+						});
+					}
+					
+					if (homeData && homeData.NewlyUpdateTopicArray) {
+						var latestNovels = [];
+						homeData.NewlyUpdateTopicArray.forEach(function(topic) {
+							latestNovels.push({
+								id: topic.ID,
+								title: topic.Title || 'Unknown',
+								author: topic.UserName || 'Unknown',
+								date: topic.DateUpdated ? new Date(topic.DateUpdated * 1000).toLocaleDateString() : 'Recently',
+								wordCount: topic.WordCount || 0
+							});
+						});
+						
+						latestListDiv.innerHTML = '';
+						latestNovels.forEach(function(novel) {
+							var div = document.createElement('div');
+							div.className = 'novel-list-item';
+							div.innerHTML = '<span class="title">' + novel.title + '</span><span class="meta">' + novel.author + ' | Updated: ' + novel.date + ' | ' + novel.wordCount + ' Words</span>';
+							div.onclick = function() { displayNovelData(novel.id); };
+							latestListDiv.appendChild(div);
+						});
+					}
+				} catch (e) {
+					console.error('Failed to load home page data:', e);
+					hotListDiv.innerHTML = '<div class="error-message">Failed to load data</div>';
+					latestListDiv.innerHTML = '<div class="error-message">Failed to load data</div>';
+				}
+			} else {
+				hotListDiv.innerHTML = '<div class="error-message">Please configure API credentials</div>';
+				latestListDiv.innerHTML = '<div class="error-message">Please configure API credentials</div>';
+			}
+		}
+		
+		/**
+		 * 初始化并启动动态数据更新
+		 */
+		function initDynamicData() {
+			updateTime();
+			updateDeviceInfo();
+			updateNetworkInfo();
+			updateScreenInfo();
+			updateBatteryInfo();
+			updateMemoryInfo();
+			updateAPICallCount(0);
+			updateAPILatency(null);
+			
+			// 每秒更新时间
+			setInterval(updateTime, 1000);
+			
+			// 每10秒更新网络状态
+			setInterval(updateNetworkInfo, 10000);
+			
+			// 每30秒更新电池和内存信息
+			setInterval(updateBatteryInfo, 30000);
+			setInterval(updateMemoryInfo, 30000);
+			setInterval(updateScreenInfo, 5000);
+			
+			// 监听窗口大小变化
+			window.addEventListener('resize', function() {
+				updateScreenInfo();
+			});
+			
+			// 监听网络状态变化
+			window.addEventListener('online', function() {
+				updateNetworkInfo();
+				document.getElementById('dc-sys').textContent = 'ONLINE';
+				document.getElementById('dc-sys').style.color = '#6c6';
+			});
+			
+			window.addEventListener('offline', function() {
+				updateNetworkInfo();
+				document.getElementById('dc-sys').textContent = 'OFFLINE';
+				document.getElementById('dc-sys').style.color = '#c66';
+			});
+		}
+		
+		/**
+		 * 记录API调用开始
+		 */
+		function startAPICall() {
+			apiCallCount++;
+			apiCallStartTime = Date.now();
+			updateAPICallCount(apiCallCount);
+		}
+		
+		/**
+		 * 记录API调用结束并计算延迟
+		 */
+		function endAPICall() {
+			if (apiCallStartTime > 0) {
+				var latency = Date.now() - apiCallStartTime;
+				updateAPILatency(latency);
+				apiCallStartTime = 0;
+			}
+		}
+		
+		/**
+		 * 更新实时时钟
+		 */
+		function updateTime() {
+			var now = new Date();
+			var hours = String(now.getHours()).padStart(2, '0');
+			var minutes = String(now.getMinutes()).padStart(2, '0');
+			var seconds = String(now.getSeconds()).padStart(2, '0');
+			document.getElementById('dc-time').textContent = hours + ':' + minutes + ':' + seconds;
+			
+			var year = now.getFullYear();
+			var month = String(now.getMonth() + 1).padStart(2, '0');
+			var day = String(now.getDate()).padStart(2, '0');
+			document.getElementById('dc-date').textContent = year + '/' + month + '/' + day;
+		}
+		
+		/**
+		 * 更新设备信息
+		 */
+		function updateDeviceInfo() {
+			var devElement = document.getElementById('dc-dev');
+			var ua = navigator.userAgent;
+			
+			// Detect device type
+			if (/iPad/.test(ua)) {
+				devElement.textContent = 'iPad';
+			} else if (/iPhone/.test(ua)) {
+				devElement.textContent = 'iPhone';
+			} else if (/Android/.test(ua)) {
+				devElement.textContent = 'Android';
+			} else if (/Windows/.test(ua)) {
+				devElement.textContent = 'WinPC';
+			} else if (/Macintosh/.test(ua)) {
+				devElement.textContent = 'Mac';
+			} else if (/Linux/.test(ua)) {
+				devElement.textContent = 'Linux';
+			} else {
+				devElement.textContent = 'Unknown';
+			}
+		}
+		
+		/**
+		 * 更新网络状态信息
+		 */
+		function updateNetworkInfo() {
+			var netElement = document.getElementById('dc-net');
+			
+			if (navigator.onLine) {
+				// Try to get connection information
+				if (navigator.connection) {
+					var conn = navigator.connection;
+					var type = conn.effectiveType || 'unknown';
+					var downlink = conn.downlink ? conn.downlink.toFixed(1) : '?';
+					netElement.textContent = type.toUpperCase() + ' ' + downlink + 'Mb';
+				} else {
+					netElement.textContent = 'ONLINE';
+				}
+			} else {
+				netElement.textContent = 'OFFLINE';
+				netElement.style.color = '#c66';
+			}
+		}
+		
+		/**
+		 * 更新屏幕信息
+		 */
+		function updateScreenInfo() {
+			var scrElement = document.getElementById('dc-scr');
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+			var dpr = window.devicePixelRatio || 1;
+			scrElement.textContent = width + 'x' + height + ' ' + dpr.toFixed(1) + 'x';
+		}
+		
+		/**
+		 * 更新电池信息
+		 */
+		function updateBatteryInfo() {
+			var battElement = document.getElementById('dc-batt');
+			
+			if ('getBattery' in navigator) {
+				navigator.getBattery().then(function(battery) {
+					var level = Math.round(battery.level * 100);
+					var charging = battery.charging ? '⚡' : '';
+					battElement.textContent = level + '%' + charging;
+					
+					if (level <= 20) {
+						battElement.style.color = '#c66';
+					} else if (level <= 50) {
+						battElement.style.color = '#f96';
+					} else {
+						battElement.style.color = '';
+					}
+				}).catch(function() {
+					battElement.textContent = 'N/A';
+				});
+			} else {
+				battElement.textContent = 'N/A';
+			}
+		}
+		
+		/**
+		 * 更新内存使用信息
+		 */
+		function updateMemoryInfo() {
+			var memElement = document.getElementById('dc-mem');
+			
+			if (performance.memory) {
+				var usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+				var totalMB = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
+				memElement.textContent = usedMB + 'MB/' + totalMB + 'MB';
+			} else {
+				memElement.textContent = 'N/A';
+			}
+		}
+		
+		/**
+		 * 更新API调用延迟
+		 */
+		function updateAPILatency(latency) {
+			var latElement = document.getElementById('dc-lat');
+			if (latency !== undefined && latency !== null) {
+				latElement.textContent = latency + 'ms';
+				
+				if (latency < 200) {
+					latElement.style.color = '#6c6';
+				} else if (latency < 500) {
+					latElement.style.color = '#f96';
+				} else {
+					latElement.style.color = '#c66';
+				}
+			} else {
+				latElement.textContent = '---';
+			}
+		}
+		
+		/**
+		 * 更新API调用计数
+		 */
+		function updateAPICallCount(count) {
+			var apiElement = document.getElementById('dc-api');
+			if (count !== undefined && count !== null) {
+				apiElement.textContent = 'Calls: ' + count;
+			} else {
+				apiElement.textContent = '---';
+			}
+		}
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			updateStatusDisplay();
+			loadDefaultView();
+			initDynamicData();
+		});
+	</script>
+	
+	<div class="headtrim"> </div>
+	<div class="baseboard"> </div>
+</body>
+</html>

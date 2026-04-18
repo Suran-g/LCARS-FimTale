@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>API Direct Test</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #0f0; padding: 2rem; }
+        .test-section { margin: 1rem 0; padding: 1rem; border: 1px solid #0f0; }
+        button { background: #0f0; color: #000; padding: 1rem 2rem; cursor: pointer; font-size: 1rem; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>FimTale API Direct Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Input API Credentials</h2>
+        <input type="text" id="apiKey" placeholder="API Key" style="width:100%; padding:0.5rem; margin:0.5rem 0;"><br>
+        <input type="password" id="apiPass" placeholder="API Pass" style="width:100%; padding:0.5rem; margin:0.5rem 0;"><br>
+        <input type="text" id="novelId" value="76448" placeholder="Novel ID (default: 76448)" style="width:100%; padding:0.5rem; margin:0.5rem 0;">
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Test API</h2>
+        <button onclick="testDirect()">Test Direct API Call</button>
+        <button onclick="testProxy()">Test Via Proxy</button>
+        <button onclick="testBrowser()">Test In Browser Tab</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Results:</h2>
+        <pre id="result">Waiting for test...</pre>
+    </div>
+    
+    <script>
+        async function testDirect() {
+            var apiKey = document.getElementById('apiKey').value;
+            var apiPass = document.getElementById('apiPass').value;
+            var novelId = document.getElementById('novelId').value;
+            
+            if (!apiKey || !apiPass) {
+                alert('Please input API Key and API Pass');
+                return;
+            }
+            
+            var url = 'https://fimtale.com/api/v1/t/' + novelId + '?APIKey=' + apiKey + '&APIPass=' + apiPass;
+            
+            var result = document.getElementById('result');
+            result.textContent = 'Testing...\n\nRequest URL:\n' + url + '\n\n';
+            
+            try {
+                var response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                result.textContent += 'HTTP Status: ' + response.status + ' ' + response.statusText + '\n\n';
+                
+                var text = await response.text();
+                result.textContent += 'Response:\n' + text.substring(0, 2000);
+                
+            } catch (error) {
+                result.textContent += 'Error:\n' + error.name + '\n' + error.message + '\n\n';
+                result.textContent += 'This is likely a CORS error.\n';
+                result.textContent += 'Browser security policy blocks cross-origin requests from localhost to fimtale.com.\n\n';
+                result.textContent += 'Solution: Use a proxy server or disable CORS for testing.';
+            }
+        }
+        
+        async function testProxy() {
+            var apiKey = document.getElementById('apiKey').value;
+            var apiPass = document.getElementById('apiPass').value;
+            var novelId = document.getElementById('novelId').value;
+            
+            if (!apiKey || !apiPass) {
+                alert('Please input API Key and API Pass');
+                return;
+            }
+            
+            var apiUrl = 'https://fimtale.com/api/v1/t/' + novelId + '?APIKey=' + apiKey + '&APIPass=' + apiPass;
+            var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(apiUrl);
+            
+            var result = document.getElementById('result');
+            result.textContent = 'Testing via proxy...\n\nOriginal URL:\n' + apiUrl + '\n\nProxy URL:\n' + proxyUrl + '\n\n';
+            
+            try {
+                var response = await fetch(proxyUrl);
+                
+                result.textContent += 'HTTP Status: ' + response.status + ' ' + response.statusText + '\n\n';
+                
+                var data = await response.json();
+                result.textContent += 'Success! Response:\n' + JSON.stringify(data, null, 2).substring(0, 2000);
+                
+            } catch (error) {
+                result.textContent += 'Error:\n' + error.name + '\n' + error.message + '\n\n';
+                result.textContent += 'Proxy failed. Try another proxy or solution.';
+            }
+        }
+        
+        function testBrowser() {
+            var apiKey = document.getElementById('apiKey').value;
+            var apiPass = document.getElementById('apiPass').value;
+            var novelId = document.getElementById('novelId').value;
+            
+            if (!apiKey || !apiPass) {
+                alert('Please input API Key and API Pass');
+                return;
+            }
+            
+            var url = 'https://fimtale.com/api/v1/t/' + novelId + '?APIKey=' + apiKey + '&APIPass=' + apiPass;
+            
+            var result = document.getElementById('result');
+            result.textContent = 'Opening in new browser tab...\n\nIf you see JSON data, the API works!\nIf you see 403/404 error, check credentials.\n\nURL:\n' + url;
+            
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>LCARS Novel Reader - Welcome</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" type="text/css" href="assets/classic.css">
+	<style>
+		.welcome-container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 2rem;
+			text-align: center;
+		}
+		
+		.welcome-title {
+			color: #f96;
+			font-size: 3rem;
+			margin-bottom: 1rem;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+		}
+		
+		.welcome-subtitle {
+			color: #fba;
+			font-size: 1.5rem;
+			margin-bottom: 2rem;
+		}
+		
+		.welcome-description {
+			color: #c9f;
+			font-size: 1.1rem;
+			line-height: 1.8;
+			margin-bottom: 2rem;
+		}
+		
+		.welcome-features {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 2rem;
+		}
+		
+		.feature-card {
+			background: rgba(201, 153, 255, 0.1);
+			border-left: 4px solid #c9f;
+			padding: 1.5rem;
+			text-align: left;
+		}
+		
+		.feature-title {
+			color: #f80;
+			font-size: 1.2rem;
+			margin-bottom: 0.5rem;
+		}
+		
+		.feature-description {
+			color: #99a;
+			font-size: 0.95rem;
+			line-height: 1.6;
+		}
+		
+		.welcome-buttons {
+			display: flex;
+			gap: 1rem;
+			justify-content: center;
+			flex-wrap: wrap;
+			margin-top: 2rem;
+		}
+		
+		.welcome-btn {
+			padding: 1rem 2.5rem;
+			border-radius: 25px;
+			font-weight: bold;
+			font-size: 1.1rem;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			border: none;
+		}
+		
+		.welcome-btn-primary {
+			background-color: #c9f;
+			color: black;
+		}
+		
+		.welcome-btn-primary:hover {
+			filter: brightness(115%);
+			transform: scale(1.05);
+		}
+		
+		.welcome-btn-secondary {
+			background-color: #89f;
+			color: black;
+		}
+		
+		.welcome-btn-secondary:hover {
+			filter: brightness(115%);
+			transform: scale(1.05);
+		}
+		
+		.welcome-btn-outline {
+			background: transparent;
+			border: 2px solid #f96;
+			color: #f96;
+		}
+		
+		.welcome-btn-outline:hover {
+			background-color: #f96;
+			color: black;
+		}
+		
+		.status-info {
+			margin-top: 3rem;
+			padding: 1.5rem;
+			background: rgba(137, 153, 255, 0.05);
+			border-left: 4px solid #89f;
+		}
+		
+		.status-title {
+			color: #89f;
+			font-size: 1.1rem;
+			margin-bottom: 0.5rem;
+		}
+		
+		.status-text {
+			color: #668;
+			font-size: 0.9rem;
+		}
+		
+		.lcars-bar {
+			height: 20px;
+			background: linear-gradient(to right, #89f, #c9f);
+			margin: 1.5rem 0;
+			border-radius: 10px;
+		}
+		
+		@media (max-width: 750px) {
+			.welcome-title {
+				font-size: 2rem;
+			}
+			
+			.welcome-subtitle {
+				font-size: 1.2rem;
+			}
+			
+			.welcome-description {
+				font-size: 1rem;
+			}
+			
+			.welcome-btn {
+				padding: 0.75rem 1.5rem;
+				font-size: 1rem;
+			}
+			
+			.data-cascade-wrapper {
+				transform: scale(0.85);
+				transform-origin: top left;
+			}
+			
+			.data-cascade-wrapper .data-column div {
+				font-size: 0.7rem;
+				padding: 0.2rem 0.4rem;
+			}
+		}
+		
+		@media (max-width: 600px) {
+			.data-cascade-wrapper {
+				transform: scale(0.75);
+			}
+			
+			.data-cascade-button-group {
+				flex-direction: column;
+			}
+			
+			.data-cascade-button-group nav {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.3rem;
+			}
+			
+			.data-cascade-button-group nav button {
+				flex: 1 1 auto;
+				min-width: 4rem;
+				font-size: 0.8rem;
+			}
+		}
+		
+		@media (max-width: 480px) {
+			.data-cascade-wrapper {
+				transform: scale(0.65);
+				max-height: 120px;
+				overflow: hidden;
+			}
+			
+			.data-cascade-wrapper .dc-row-5 {
+				display: none;
+			}
+		}
+	</style>
+</head>
+<body>
+	<audio id="audio1" src="assets/beep1.mp3" preload="auto"></audio>
+	<audio id="audio2" src="assets/beep2.mp3" preload="auto"></audio>
+	<audio id="audio3" src="assets/beep3.mp3" preload="auto"></audio>
+
+	<div class="wrap-everything">
+		<section id="column-1">
+			<div class="lcars-frame">
+				<div class="frame-col-1">
+					<div class="frame-col-1-cell-a"></div>
+					<div class="frame-col-1-cell-b"></div>
+					<div class="frame-col-1-cell-c"></div>
+				</div>
+				<div class="frame-col-2"> </div>
+				<div class="frame-col-3 display-vertical">
+					<div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+				</div>
+				<div class="frame-col-4"> </div>
+				<div class="frame-col-5">
+					<div class="frame-col-5-cell-a"></div>
+					<div class="frame-col-5-cell-b"></div>
+					<div class="frame-col-5-cell-c"></div>
+				</div>
+			</div>
+			<div class="pillbox">
+				<button onclick="playSoundAndRedirect('audio1', 'classic-standard.html')" class="pill">HOME</button>
+				<button onclick="playSoundAndRedirect('audio1', 'novel-reader.html')" class="pill">READER</button>
+				<button onclick="playSoundAndRedirect('audio1', 'api-config.html')" class="pill">API</button>
+				<button onclick="playSoundAndRedirect('audio1', '#')" class="pill">HELP</button>
+			</div>
+			<div class="lcars-list-2 uppercase">
+				<ul>
+					<li>System: Online</li>
+					<li>Status: Ready</li>
+					<li>API: Config</li>
+					<li class="bullet-almond-creme font-almond-creme">User: Guest</li>
+				</ul>
+			</div>
+		</section>
+		
+		<section id="column-2">
+			<div class="panel-11"> NOVEL </div>		
+			<button onclick="playSoundAndRedirect('audio2', 'classic-standard.html')" class="sidebar-button button-almond-creme">HOME</button>
+			<button onclick="playSoundAndRedirect('audio2', 'novel-reader.html')" class="sidebar-button button-butterscotch">READER</button>
+			<button onclick="playSoundAndRedirect('audio2', 'api-config.html')" class="sidebar-button button-african-violet">API KEY</button>
+			<div class="panel-12"> SYSTEM </div>
+			<div class="panel-13">ACTIVE</div>
+			<div class="panel-14">LOCAL</div>
+			<div class="panel-15">SECURE</div>
+		</section>
+		
+		<section id="column-3">
+			<div class="wrap">
+				<div class="left-frame-top">
+					<button onclick="playSoundAndRedirect('audio1', 'classic-standard.html')" class="panel-1-button">HOME</button>
+					<div class="panel-2">01<span class="hop">-INDEX</span></div>
+				</div>
+				<div class="right-frame-top">
+					<div class="banner">LCARS &#149; READER</div>
+					<div class="data-cascade-button-group">
+						<div class="data-cascade-wrapper" id="default">
+							<div class="data-column">
+								<div class="dc-row-1">SYS</div>
+								<div class="dc-row-1">MODE</div>
+								<div class="dc-row-2">TIME</div>
+								<div class="dc-row-3">DATE</div>
+								<div class="dc-row-3">NET</div>
+								<div class="dc-row-4">DEV</div>
+								<div class="dc-row-5">SCR</div>
+								<div class="dc-row-1">MEM</div>
+								<div class="dc-row-2">BATT</div>
+								<div class="dc-row-3">UPTIME</div>
+								<div class="dc-row-4">LANG</div>
+								<div class="dc-row-5">UA</div>
+							</div>
+							<div class="dc-spacer"></div>
+							<div class="data-column">
+								<div class="dc-row-1" id="home-sys">ONLINE</div>
+								<div class="dc-row-1" id="home-mode">HOME</div>
+								<div class="dc-row-2" id="home-time">--:--:--</div>
+								<div class="dc-row-3" id="home-date">----/--/--</div>
+								<div class="dc-row-3" id="home-net">---</div>
+								<div class="dc-row-4" id="home-dev">---</div>
+								<div class="dc-row-5" id="home-scr">---</div>
+								<div class="dc-row-1" id="home-mem">N/A</div>
+								<div class="dc-row-2" id="home-batt">N/A</div>
+								<div class="dc-row-3" id="home-uptime">---</div>
+								<div class="dc-row-4" id="home-lang">---</div>
+								<div class="dc-row-5" id="home-ua">---</div>
+							</div>
+						</div>				
+						<nav> 
+							<button onclick="playSoundAndRedirect('audio1', 'classic-standard.html')">HOME</button>
+							<button onclick="playSoundAndRedirect('audio1', 'novel-reader.html')">READER</button>
+							<button onclick="playSoundAndRedirect('audio1', 'api-config.html')">API</button>
+							<button onclick="playSoundAndRedirect('audio1', '#')">HELP</button>
+						</nav>
+					</div>
+					<div class="bar-panel first-bar-panel">
+						<div class="bar-1"></div>
+						<div class="bar-2"></div>
+						<div class="bar-3"></div>
+						<div class="bar-4"></div>
+						<div class="bar-5"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="wrap" id="gap">
+				<div class="left-frame">
+					<button onclick="topFunction(); playSound('audio3')" id="topBtn"><span class="hop">screen</span> top</button>
+					<div>
+						<div class="panel-3" onclick="playSoundAndRedirect('audio2', 'classic-standard.html')">02<span class="hop">-HOME</span></div>
+						<div class="panel-4" onclick="playSoundAndRedirect('audio2', 'novel-reader.html')">03<span class="hop">-READER</span></div>
+						<div class="panel-5" onclick="playSoundAndRedirect('audio2', 'api-config.html')">04<span class="hop">-API KEY</span></div>
+						<div class="panel-6">05<span class="hop">-HELP</span></div>
+						<div class="panel-7">06<span class="hop">-ABOUT</span></div>
+						<div class="panel-8">07<span class="hop">-CONFIG</span></div>
+						<div class="panel-9">08<span class="hop">-EXIT</span></div>
+					</div>
+					<div>
+						<div class="panel-10">09<span class="hop">-STATUS</span></div>
+					</div>
+				</div>
+				
+				<div class="right-frame">
+					<div class="bar-panel">
+						<div class="bar-6"></div>
+						<div class="bar-7"></div>
+						<div class="bar-8"></div>
+						<div class="bar-9"></div>
+						<div class="bar-10"></div>
+					</div>
+					
+					<main>
+						<div class="welcome-container">
+							<h1 class="welcome-title">LCARS NOVEL READER</h1>
+							<h2 class="welcome-subtitle">小说阅读器</h2>
+							
+							<div class="lcars-bar"></div>
+							
+							<p class="welcome-description">
+								欢迎使用 LCARS 小说阅读器，一个基于星际迷航主题设计的现代化小说阅读平台。
+								通过 API 连接 FimTale 小说库，享受流畅的阅读体验。
+							</p>
+							
+							<div class="welcome-features">
+								<div class="feature-card">
+									<h3 class="feature-title">📚 海量小说</h3>
+									<p class="feature-description">
+										连接 FimTale 小说库，访问数千部精彩小说作品，涵盖多种题材和类型。
+									</p>
+								</div>
+								<div class="feature-card">
+									<h3 class="feature-title">🎨 LCARS 风格</h3>
+									<p class="feature-description">
+										采用星际迷航 LCARS 主题设计，紫色科技感界面，带来沉浸式阅读体验。
+									</p>
+								</div>
+								<div class="feature-card">
+									<h3 class="feature-title">📱 响应式设计</h3>
+									<p class="feature-description">
+										完美适配各种设备尺寸，从桌面端到移动端，随时随地享受阅读乐趣。
+									</p>
+								</div>
+								<div class="feature-card">
+									<h3 class="feature-title">🔐 安全连接</h3>
+									<p class="feature-description">
+										使用 API Key 进行身份验证，确保您的阅读数据安全可靠。
+									</p>
+								</div>
+							</div>
+							
+							<div class="lcars-bar"></div>
+							
+							<div class="welcome-buttons">
+								<button class="welcome-btn welcome-btn-primary" onclick="playSoundAndRedirect('audio2', 'novel-reader.html')">
+									开始阅读
+								</button>
+								<button class="welcome-btn welcome-btn-secondary" onclick="playSoundAndRedirect('audio2', 'api-config.html')">
+									配置 API
+								</button>
+								<button class="welcome-btn welcome-btn-outline" onclick="playSound('audio3')">
+									了解更多
+								</button>
+							</div>
+							
+							<div class="status-info">
+								<h3 class="status-title">系统状态</h3>
+								<p class="status-text">
+									<span id="api-status">API 状态: 未配置</span> | 
+									<span id="user-status">用户: 访客模式</span> | 
+									<span id="connection-status">连接: 离线</span>
+								</p>
+							</div>
+						</div>
+					</main>
+					
+					<footer>
+			 		Content &copy; 2024 LCARS Novel Reader<br>
+					LCARS Inspired Website Template by <a href="https://www.thelcars.com">www.TheLCARS.com</a>
+					</footer> 
+				</div>
+			</div>
+		</section>
+	</div>
+	
+	<script type="text/javascript" src="assets/lcars.js"></script>
+	<script type="text/javascript" src="assets/novel-api.js?v=20260418c"></script>
+	<script type="text/javascript">
+		function playSound(audioId) {
+			try {
+				var audio = document.getElementById(audioId);
+				if (audio) {
+					audio.currentTime = 0;
+					audio.play().catch(function() {});
+				}
+			} catch(e) {}
+		}
+		
+		function playSoundAndRedirect(audioId, url) {
+			try {
+				var audio = document.getElementById(audioId);
+				if (audio) {
+					audio.play().catch(function() {});
+					audio.onended = function() {
+						window.location.href = url;
+					};
+				} else {
+					window.location.href = url;
+				}
+			} catch(e) {
+				window.location.href = url;
+			}
+		}
+		
+		/**
+		 * 初始化动态数据更新
+		 */
+		function initDynamicData() {
+			updateTime();
+			updateDeviceInfo();
+			updateNetworkInfo();
+			updateScreenInfo();
+			updateBatteryInfo();
+			updateMemoryInfo();
+			updateUptime();
+			updateLanguage();
+			updateUserAgent();
+			
+			setInterval(updateTime, 1000);
+			setInterval(updateNetworkInfo, 10000);
+			setInterval(updateBatteryInfo, 30000);
+			setInterval(updateMemoryInfo, 30000);
+			setInterval(updateUptime, 1000);
+			setInterval(updateScreenInfo, 5000);
+			
+			window.addEventListener('resize', updateScreenInfo);
+			window.addEventListener('online', updateNetworkInfo);
+			window.addEventListener('offline', updateNetworkInfo);
+		}
+		
+		function updateTime() {
+			var now = new Date();
+			var h = String(now.getHours()).padStart(2, '0');
+			var m = String(now.getMinutes()).padStart(2, '0');
+			var s = String(now.getSeconds()).padStart(2, '0');
+			document.getElementById('home-time').textContent = h + ':' + m + ':' + s;
+			
+			var y = now.getFullYear();
+			var mo = String(now.getMonth() + 1).padStart(2, '0');
+			var d = String(now.getDate()).padStart(2, '0');
+			document.getElementById('home-date').textContent = y + '/' + mo + '/' + d;
+		}
+		
+		function updateDeviceInfo() {
+			var dev = document.getElementById('home-dev');
+			var ua = navigator.userAgent;
+			if (/iPad/.test(ua)) dev.textContent = 'iPad';
+			else if (/iPhone/.test(ua)) dev.textContent = 'iPhone';
+			else if (/Android/.test(ua)) dev.textContent = 'Android';
+			else if (/Windows/.test(ua)) dev.textContent = 'WinPC';
+			else if (/Macintosh/.test(ua)) dev.textContent = 'Mac';
+			else if (/Linux/.test(ua)) dev.textContent = 'Linux';
+			else dev.textContent = 'N/A';
+		}
+		
+		function updateNetworkInfo() {
+			var net = document.getElementById('home-net');
+			var sys = document.getElementById('home-sys');
+			
+			if (navigator.onLine) {
+				sys.textContent = 'ONLINE';
+				sys.style.color = '#6c6';
+				if (navigator.connection) {
+					var conn = navigator.connection;
+					var type = conn.effectiveType || 'unknown';
+					var downlink = conn.downlink ? conn.downlink.toFixed(1) : '?';
+					net.textContent = type.toUpperCase() + ' ' + downlink + 'Mb';
+				} else {
+					net.textContent = 'ONLINE';
+				}
+			} else {
+				sys.textContent = 'OFFLINE';
+				sys.style.color = '#c66';
+				net.textContent = 'OFFLINE';
+			}
+		}
+		
+		function updateScreenInfo() {
+			var scr = document.getElementById('home-scr');
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+			var dpr = window.devicePixelRatio || 1;
+			scr.textContent = w + 'x' + h + ' ' + dpr.toFixed(1) + 'x';
+		}
+		
+		function updateBatteryInfo() {
+			var batt = document.getElementById('home-batt');
+			if ('getBattery' in navigator) {
+				navigator.getBattery().then(function(battery) {
+					var level = Math.round(battery.level * 100);
+					var charging = battery.charging ? '⚡' : '';
+					batt.textContent = level + '%' + charging;
+					if (level <= 20) batt.style.color = '#c66';
+					else if (level <= 50) batt.style.color = '#f96';
+					else batt.style.color = '';
+				}).catch(function() {
+					batt.textContent = 'N/A';
+				});
+			} else {
+				batt.textContent = 'N/A';
+			}
+		}
+		
+		function updateMemoryInfo() {
+			var mem = document.getElementById('home-mem');
+			if (performance.memory) {
+				var usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+				var totalMB = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
+				mem.textContent = usedMB + 'MB/' + totalMB + 'MB';
+			} else {
+				mem.textContent = 'N/A';
+			}
+		}
+		
+		var pageLoadTime = Date.now();
+		function updateUptime() {
+			var uptime = document.getElementById('home-uptime');
+			var elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
+			var hours = Math.floor(elapsed / 3600);
+			var minutes = Math.floor((elapsed % 3600) / 60);
+			var seconds = elapsed % 60;
+			uptime.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+		}
+		
+		function updateLanguage() {
+			var lang = document.getElementById('home-lang');
+			lang.textContent = navigator.language || 'N/A';
+		}
+		
+		function updateUserAgent() {
+			var ua = document.getElementById('home-ua');
+			var browser = 'N/A';
+			var userAgent = navigator.userAgent;
+			if (/Chrome/.test(userAgent) && !/Edg/.test(userAgent)) browser = 'Chrome';
+			else if (/Firefox/.test(userAgent)) browser = 'Firefox';
+			else if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) browser = 'Safari';
+			else if (/Edg/.test(userAgent)) browser = 'Edge';
+			ua.textContent = browser;
+		}
+		
+		function checkAPIStatus() {
+			var apiStatus = document.getElementById('api-status');
+			var userStatus = document.getElementById('user-status');
+			var connectionStatus = document.getElementById('connection-status');
+			
+			if (NovelAPI.hasCredentials()) {
+				apiStatus.textContent = 'API 状态: 已配置';
+				apiStatus.style.color = '#6c6';
+				userStatus.textContent = '用户: 已登录';
+				userStatus.style.color = '#6c6';
+				connectionStatus.textContent = '连接: 在线';
+				connectionStatus.style.color = '#6c6';
+			} else {
+				apiStatus.textContent = 'API 状态: 未配置';
+				apiStatus.style.color = '#c66';
+				userStatus.textContent = '用户: 访客模式';
+				userStatus.style.color = '#f80';
+				connectionStatus.textContent = '连接: 离线';
+				connectionStatus.style.color = '#c66';
+			}
+		}
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			checkAPIStatus();
+			initDynamicData();
+		});
+	</script>
+	
+	<div class="headtrim"> </div>
+	<div class="baseboard"> </div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>API Configuration</title>
+	<link rel="stylesheet" type="text/css" href="assets/classic.css">
+</head>
+<body>
+	<div class="wrap-everything">
+		<section id="column-1">
+			<div class="lcars-frame">
+				<div class="frame-col-1">
+					<div class="frame-col-1-cell-a"></div>
+					<div class="frame-col-1-cell-b"></div>
+					<div class="frame-col-1-cell-c"></div>
+				</div>
+				<div class="frame-col-2"> </div>
+				<div class="frame-col-3 display-vertical">
+					<div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+				</div>
+				<div class="frame-col-4"> </div>
+				<div class="frame-col-5">
+					<div class="frame-col-5-cell-a"></div>
+					<div class="frame-col-5-cell-b"></div>
+					<div class="frame-col-5-cell-c"></div>
+				</div>
+			</div>
+			<div class="pillbox">
+				<button onclick="window.location.href='classic-standard.html'" class="pill">HOME</button>
+				<button onclick="window.location.href='novel-reader.html'" class="pill">READER</button>
+				<button onclick="clearAPIKey()" class="pill">CLEAR</button>
+				<button onclick="testAPIConnection()" class="pill">TEST</button>
+			</div>
+		</section>
+		
+		<section id="column-2">
+			<div class="panel-11"> API KEY </div>		
+			<button onclick="window.location.href='classic-standard.html'" class="sidebar-button button-almond-creme">HOME</button>
+			<button onclick="window.location.href='novel-reader.html'" class="sidebar-button button-butterscotch">READER</button>
+			<button onclick="testAPIConnection()" class="sidebar-button button-african-violet">TEST</button>
+			<div class="panel-12"> CONFIG </div>
+			<div class="panel-13">SECURE</div>
+			<div class="panel-14">LOCAL</div>
+			<div class="panel-15">ACTIVE</div>
+		</section>
+		
+		<section id="column-3">
+			<div class="wrap">
+				<div class="left-frame-top">
+					<button onclick="window.location.href='classic-standard.html'" class="panel-1-button">API KEY</button>
+					<div class="panel-2">02<span class="hop">-CONFIG</span></div>
+				</div>
+				<div class="right-frame-top">
+					<div class="banner">LCARS &#149; API CONFIG</div>
+					<nav> 
+						<button onclick="window.location.href='classic-standard.html'">HOME</button>
+						<button onclick="window.location.href='novel-reader.html'">READER</button>
+						<button onclick="clearAPIKey()">CLEAR</button>
+						<button onclick="testAPIConnection()">TEST</button>
+					</nav>
+					<div class="bar-panel first-bar-panel">
+						<div class="bar-1"></div>
+						<div class="bar-2"></div>
+						<div class="bar-3"></div>
+						<div class="bar-4"></div>
+						<div class="bar-5"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="wrap" id="gap">
+				<div class="left-frame">
+					<button onclick="topFunction()" id="topBtn"><span class="hop">screen</span> top</button>
+					<div>
+						<div class="panel-3" onclick="window.location.href='classic-standard.html'">03<span class="hop">-HOME</span></div>
+						<div class="panel-4" onclick="window.location.href='novel-reader.html'">04<span class="hop">-READER</span></div>
+						<div class="panel-5" onclick="testAPIConnection()">05<span class="hop">-TEST</span></div>
+					</div>
+				</div>
+				
+				<div class="right-frame">
+					<div class="bar-panel">
+						<div class="bar-6"></div>
+						<div class="bar-7"></div>
+						<div class="bar-8"></div>
+						<div class="bar-9"></div>
+						<div class="bar-10"></div>
+					</div>
+					
+					<main>
+						<h1 class="font-gold">API KEY CONFIGURATION</h1>
+						<h2>API密钥配置</h2>
+						
+						<div style="max-width: 600px; margin: 2rem auto; padding: 2rem; background: rgba(201,153,255,0.1); border-left: 4px solid #c9f;">
+							<div style="margin-bottom: 1rem;">
+								<label style="color: #f80; font-weight: bold;">API Key</label>
+								<input type="text" id="apiKey" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.5); border: 2px solid #c9f; color: #f5f6fa; border-radius: 8px;" placeholder="请输入API Key">
+							</div>
+							<div style="margin-bottom: 1rem;">
+								<label style="color: #f80; font-weight: bold;">API Pass</label>
+								<input type="password" id="apiPass" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.5); border: 2px solid #c9f; color: #f5f6fa; border-radius: 8px;" placeholder="请输入API Pass">
+							</div>
+							<div style="margin-bottom: 1.5rem;">
+								<label style="color: #f80; font-weight: bold;">API Endpoint</label>
+								<input type="text" id="apiEndpoint" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.5); border: 2px solid #c9f; color: #f5f6fa; border-radius: 8px;" value="https://fimtale.com/api/v1">
+							</div>
+							<button onclick="saveAPIKey()" style="padding: 0.75rem 2rem; background: #993; color: black; border-radius: 20px; font-weight: bold; margin-right: 1rem;">保存配置</button>
+							<button onclick="window.location.href='classic-standard.html'" style="padding: 0.75rem 2rem; background: #c44; color: black; border-radius: 20px; font-weight: bold; margin-right: 1rem;">取消</button>
+							<button onclick="testAPIConnection()" style="padding: 0.75rem 2rem; background: #89f; color: black; border-radius: 20px; font-weight: bold;">测试连接</button>
+						</div>
+						
+						<div style="max-width: 600px; margin: 2rem auto; padding: 1rem; background: rgba(201,153,255,0.1); border-left: 4px solid #c9f;">
+							<h3>当前状态</h3>
+							<p><strong>API Key:</strong> <span id="currentKey">未配置</span></p>
+							<p><strong>API Pass:</strong> <span id="currentPass">未配置</span></p>
+							<p><strong>连接:</strong> <span id="connectionStatus">未测试</span></p>
+						</div>
+					</main>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+	<script>
+		const STORAGE_KEY_APIKEY = 'lcars_novel_api_key';
+		const STORAGE_KEY_APIPASS = 'lcars_novel_api_pass';
+		const STORAGE_KEY_ENDPOINT = 'lcars_novel_api_endpoint';
+		
+		function saveAPIKey() {
+			var apiKey = document.getElementById('apiKey').value.trim();
+			var apiPass = document.getElementById('apiPass').value.trim();
+			var apiEndpoint = document.getElementById('apiEndpoint').value.trim();
+			
+			if (!apiKey) { alert('请输入API Key'); return; }
+			if (!apiPass) { alert('请输入API Pass'); return; }
+			
+			localStorage.setItem(STORAGE_KEY_APIKEY, apiKey);
+			localStorage.setItem(STORAGE_KEY_APIPASS, apiPass);
+			localStorage.setItem(STORAGE_KEY_ENDPOINT, apiEndpoint);
+			
+			document.getElementById('currentKey').textContent = '已配置';
+			document.getElementById('currentPass').textContent = '已配置';
+			alert('API配置保存成功!');
+		}
+		
+		function clearAPIKey() {
+			localStorage.removeItem(STORAGE_KEY_APIKEY);
+			localStorage.removeItem(STORAGE_KEY_APIPASS);
+			localStorage.removeItem(STORAGE_KEY_ENDPOINT);
+			
+			document.getElementById('apiKey').value = '';
+			document.getElementById('apiPass').value = '';
+			document.getElementById('currentKey').textContent = '未配置';
+			document.getElementById('currentPass').textContent = '未配置';
+			document.getElementById('connectionStatus').textContent = '未测试';
+			alert('API配置已清除');
+		}
+		
+		async function testAPIConnection() {
+			var statusElement = document.getElementById('connectionStatus');
+			statusElement.textContent = '测试中...';
+			
+			var apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem(STORAGE_KEY_APIKEY);
+			var apiPass = document.getElementById('apiPass').value.trim() || localStorage.getItem(STORAGE_KEY_APIPASS);
+			var apiEndpoint = document.getElementById('apiEndpoint').value.trim() || localStorage.getItem(STORAGE_KEY_ENDPOINT) || 'https://fimtale.com/api/v1';
+			
+			if (!apiKey || !apiPass) {
+				statusElement.textContent = '未配置';
+				alert('请先配置API Key和API Pass');
+				return;
+			}
+			
+			try {
+				var url = apiEndpoint.replace(/\/+$/, '') + '/t/4?APIKey=' + encodeURIComponent(apiKey) + '&APIPass=' + encodeURIComponent(apiPass);
+				console.log('API测试URL:', url);
+				
+				var response = await fetch(url, { method: 'GET', timeout: 10000 });
+				
+				if (response.ok) {
+					var data = await response.json();
+					statusElement.textContent = '已连接';
+					alert('API连接测试成功!\n\n请求URL: ' + url + '\n\n服务器响应: ' + JSON.stringify(data).substring(0, 500) + '...');
+				} else {
+					statusElement.textContent = '连接失败';
+					alert('API连接测试失败: HTTP ' + response.status + ' - ' + response.statusText + '\n\n请求URL: ' + url);
+				}
+			} catch (error) {
+				statusElement.textContent = '连接失败';
+				alert('API连接测试失败: ' + error.message);
+			}
+		}
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			var storedKey = localStorage.getItem(STORAGE_KEY_APIKEY);
+			var storedPass = localStorage.getItem(STORAGE_KEY_APIPASS);
+			var storedEndpoint = localStorage.getItem(STORAGE_KEY_ENDPOINT);
+			
+			if (storedKey) { document.getElementById('apiKey').value = storedKey; document.getElementById('currentKey').textContent = '已配置'; }
+			if (storedPass) { document.getElementById('apiPass').value = storedPass; document.getElementById('currentPass').textContent = '已配置'; }
+			if (storedEndpoint) { document.getElementById('apiEndpoint').value = storedEndpoint; }
+		});
+	</script>
+	
+	<div class="headtrim"> </div>
+	<div class="baseboard"> </div>
+</body>
+</html>

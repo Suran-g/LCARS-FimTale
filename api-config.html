@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>API Configuration</title>
+	<link rel="stylesheet" type="text/css" href="assets/classic.css">
+	<style>
+		.form-container { max-width: 600px; margin: 2rem auto; padding: 2rem; background: rgba(201,153,255,0.1); border-left: 4px solid #c9f; }
+		.form-group { margin-bottom: 1rem; }
+		label { display: block; color: #f80; font-weight: bold; margin-bottom: 0.5rem; }
+		input { width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.5); border: 2px solid #c9f; color: #f5f6fa; border-radius: 8px; }
+		button { padding: 0.75rem 2rem; border-radius: 20px; font-weight: bold; margin-right: 1rem; cursor: pointer; }
+		.submit-btn { background: #993; color: black; }
+		.cancel-btn { background: #c44; color: black; }
+		.test-btn { background: #89f; color: black; }
+		.status-panel { margin-top: 2rem; padding: 1rem; background: rgba(201,153,255,0.1); border-left: 4px solid #c9f; }
+		
+		@media (max-width: 750px) {
+			.data-cascade-wrapper {
+				transform: scale(0.85);
+				transform-origin: top left;
+			}
+			
+			.data-cascade-wrapper .data-column div {
+				font-size: 0.7rem;
+				padding: 0.2rem 0.4rem;
+			}
+		}
+		
+		@media (max-width: 600px) {
+			.data-cascade-wrapper {
+				transform: scale(0.75);
+			}
+			
+			.data-cascade-button-group {
+				flex-direction: column;
+			}
+			
+			.data-cascade-button-group nav {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.3rem;
+			}
+			
+			.data-cascade-button-group nav button {
+				flex: 1 1 auto;
+				min-width: 4rem;
+				font-size: 0.8rem;
+			}
+		}
+		
+		@media (max-width: 480px) {
+			.data-cascade-wrapper {
+				transform: scale(0.65);
+				max-height: 120px;
+				overflow: hidden;
+			}
+			
+			.data-cascade-wrapper .dc-row-5 {
+				display: none;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap-everything">
+		<section id="column-1">
+			<div class="lcars-frame">
+				<div class="frame-col-1">
+					<div class="frame-col-1-cell-a"></div>
+					<div class="frame-col-1-cell-b"></div>
+					<div class="frame-col-1-cell-c"></div>
+				</div>
+				<div class="frame-col-2"> </div>
+				<div class="frame-col-3 display-vertical">
+					<div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+				</div>
+				<div class="frame-col-4"> </div>
+				<div class="frame-col-5">
+					<div class="frame-col-5-cell-a"></div>
+					<div class="frame-col-5-cell-b"></div>
+					<div class="frame-col-5-cell-c"></div>
+				</div>
+			</div>
+			<div class="pillbox">
+				<button onclick="window.location.href='classic-standard.html'" class="pill">HOME</button>
+				<button onclick="window.location.href='novel-reader.html'" class="pill">READER</button>
+				<button onclick="clearAPIKey()" class="pill">CLEAR</button>
+				<button onclick="testAPIConnection()" class="pill">TEST</button>
+			</div>
+		</section>
+		
+		<section id="column-2">
+			<div class="panel-11"> API KEY </div>		
+			<button onclick="window.location.href='classic-standard.html'" class="sidebar-button button-almond-creme">HOME</button>
+			<button onclick="window.location.href='novel-reader.html'" class="sidebar-button button-butterscotch">READER</button>
+			<button onclick="testAPIConnection()" class="sidebar-button button-african-violet">TEST</button>
+			<div class="panel-12"> CONFIG </div>
+			<div class="panel-13">SECURE</div>
+			<div class="panel-14">LOCAL</div>
+			<div class="panel-15">ACTIVE</div>
+		</section>
+		
+		<section id="column-3">
+			<div class="wrap">
+				<div class="left-frame-top">
+					<button onclick="window.location.href='classic-standard.html'" class="panel-1-button">API KEY</button>
+					<div class="panel-2">02<span class="hop">-CONFIG</span></div>
+				</div>
+				<div class="right-frame-top">
+				<div class="banner">LCARS &#149; API CONFIG</div>
+				<div class="data-cascade-button-group">
+					<div class="data-cascade-wrapper" id="api-config-data">
+						<div class="data-column">
+							<div class="dc-row-1">SYS</div>
+							<div class="dc-row-1">MODE</div>
+							<div class="dc-row-2">TIME</div>
+							<div class="dc-row-3">DATE</div>
+							<div class="dc-row-3">NET</div>
+							<div class="dc-row-4">DEV</div>
+							<div class="dc-row-5">SCR</div>
+							<div class="dc-row-1">MEM</div>
+							<div class="dc-row-2">BATT</div>
+							<div class="dc-row-3">UPTIME</div>
+							<div class="dc-row-4">LANG</div>
+							<div class="dc-row-5">UA</div>
+						</div>
+						<div class="dc-spacer"></div>
+						<div class="data-column">
+							<div class="dc-row-1" id="api-sys">ONLINE</div>
+							<div class="dc-row-1" id="api-mode">CONFIG</div>
+							<div class="dc-row-2" id="api-time">--:--:--</div>
+							<div class="dc-row-3" id="api-date">----/--/--</div>
+							<div class="dc-row-3" id="api-net">---</div>
+							<div class="dc-row-4" id="api-dev">---</div>
+							<div class="dc-row-5" id="api-scr">---</div>
+							<div class="dc-row-1" id="api-mem">N/A</div>
+							<div class="dc-row-2" id="api-batt">N/A</div>
+							<div class="dc-row-3" id="api-uptime">---</div>
+							<div class="dc-row-4" id="api-lang">---</div>
+							<div class="dc-row-5" id="api-ua">---</div>
+						</div>
+					</div>
+					<nav> 
+						<button onclick="window.location.href='classic-standard.html'">HOME</button>
+						<button onclick="window.location.href='novel-reader.html'">READER</button>
+						<button onclick="clearAPIKey()">CLEAR</button>
+						<button onclick="testAPIConnection()">TEST</button>
+					</nav>
+				</div>
+					<div class="bar-panel first-bar-panel">
+						<div class="bar-1"></div>
+						<div class="bar-2"></div>
+						<div class="bar-3"></div>
+						<div class="bar-4"></div>
+						<div class="bar-5"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="wrap" id="gap">
+				<div class="left-frame">
+					<button onclick="topFunction()" id="topBtn"><span class="hop">screen</span> top</button>
+					<div>
+						<div class="panel-3" onclick="window.location.href='classic-standard.html'">03<span class="hop">-HOME</span></div>
+						<div class="panel-4" onclick="window.location.href='novel-reader.html'">04<span class="hop">-READER</span></div>
+						<div class="panel-5" onclick="testAPIConnection()">05<span class="hop">-TEST</span></div>
+					</div>
+				</div>
+				
+				<div class="right-frame">
+					<div class="bar-panel">
+						<div class="bar-6"></div>
+						<div class="bar-7"></div>
+						<div class="bar-8"></div>
+						<div class="bar-9"></div>
+						<div class="bar-10"></div>
+					</div>
+					
+					<main>
+						<h1 class="font-gold">API KEY CONFIGURATION</h1>
+						<h2>API密钥配置</h2>
+						
+						<div class="form-container">
+							<div class="form-group">
+								<label>API Key</label>
+								<input type="text" id="apiKey" placeholder="请输入API Key">
+							</div>
+							<div class="form-group">
+								<label>API Pass</label>
+								<input type="password" id="apiPass" placeholder="请输入API Pass">
+							</div>
+							<div class="form-group">
+								<label>API Endpoint</label>
+								<input type="text" id="apiEndpoint" value="https://fimtale.com/api/v1" readonly>
+							</div>
+							<button class="submit-btn" onclick="saveAPIKey()">保存配置</button>
+							<button class="cancel-btn" onclick="window.location.href='classic-standard.html'">取消</button>
+							<button class="test-btn" onclick="testAPIConnection()">测试连接</button>
+						</div>
+						
+						<div class="status-panel">
+							<h3>当前状态</h3>
+							<p><strong>API Key:</strong> <span id="currentKey">未配置</span></p>
+							<p><strong>API Pass:</strong> <span id="currentPass">未配置</span></p>
+							<p><strong>连接:</strong> <span id="connectionStatus">未测试</span></p>
+						</div>
+					</main>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+	<script type="text/javascript" src="assets/novel-api.js?v=20260418"></script>
+	<script>
+		function saveAPIKey() {
+			var apiKey = document.getElementById('apiKey').value.trim();
+			var apiPass = document.getElementById('apiPass').value.trim();
+			
+			if (!apiKey) { alert('请输入API Key'); return; }
+			if (!apiPass) { alert('请输入API Pass'); return; }
+			
+			NovelAPI.saveCredentials(apiKey, apiPass);
+			
+			document.getElementById('currentKey').textContent = '已配置';
+			document.getElementById('currentPass').textContent = '已配置';
+			alert('API配置保存成功!');
+		}
+		
+		function clearAPIKey() {
+			NovelAPI.clearCredentials();
+			
+			document.getElementById('apiKey').value = '';
+			document.getElementById('apiPass').value = '';
+			document.getElementById('currentKey').textContent = '未配置';
+			document.getElementById('currentPass').textContent = '未配置';
+			document.getElementById('connectionStatus').textContent = '未测试';
+			alert('API配置已清除');
+		}
+		
+		async function testAPIConnection() {
+			var statusElement = document.getElementById('connectionStatus');
+			statusElement.textContent = '测试中...';
+			
+			var apiKey = document.getElementById('apiKey').value.trim();
+			var apiPass = document.getElementById('apiPass').value.trim();
+			
+			if (apiKey && apiPass) {
+				NovelAPI.saveCredentials(apiKey, apiPass);
+			}
+			
+			if (!NovelAPI.hasCredentials()) {
+				statusElement.textContent = '未配置';
+				alert('请先配置API Key和API Pass');
+				return;
+			}
+			
+			try {
+				var result = await NovelAPI.testConnection();
+				
+				if (result.success) {
+					statusElement.textContent = '已连接';
+					alert('API连接测试成功!\n\n测试URL: ' + NovelAPI.API_ENDPOINT + '/t/76448\n\n服务器响应: ' + JSON.stringify(result.data).substring(0, 500) + '...');
+				} else {
+					statusElement.textContent = '连接失败';
+					alert('API连接测试失败: ' + result.error);
+				}
+			} catch (error) {
+				statusElement.textContent = '连接失败';
+				alert('API连接测试失败: ' + error.message);
+			}
+		}
+		
+		/**
+		 * 初始化动态数据更新
+		 */
+		function initDynamicData() {
+			updateTime();
+			updateDeviceInfo();
+			updateNetworkInfo();
+			updateScreenInfo();
+			updateBatteryInfo();
+			updateMemoryInfo();
+			updateUptime();
+			updateLanguage();
+			updateUserAgent();
+			
+			setInterval(updateTime, 1000);
+			setInterval(updateNetworkInfo, 10000);
+			setInterval(updateBatteryInfo, 30000);
+			setInterval(updateMemoryInfo, 30000);
+			setInterval(updateUptime, 1000);
+			setInterval(updateScreenInfo, 5000);
+			
+			window.addEventListener('resize', updateScreenInfo);
+			window.addEventListener('online', updateNetworkInfo);
+			window.addEventListener('offline', updateNetworkInfo);
+		}
+		
+		function updateTime() {
+			var now = new Date();
+			var h = String(now.getHours()).padStart(2, '0');
+			var m = String(now.getMinutes()).padStart(2, '0');
+			var s = String(now.getSeconds()).padStart(2, '0');
+			document.getElementById('api-time').textContent = h + ':' + m + ':' + s;
+			
+			var y = now.getFullYear();
+			var mo = String(now.getMonth() + 1).padStart(2, '0');
+			var d = String(now.getDate()).padStart(2, '0');
+			document.getElementById('api-date').textContent = y + '/' + mo + '/' + d;
+		}
+		
+		function updateDeviceInfo() {
+			var dev = document.getElementById('api-dev');
+			var ua = navigator.userAgent;
+			if (/iPad/.test(ua)) dev.textContent = 'iPad';
+			else if (/iPhone/.test(ua)) dev.textContent = 'iPhone';
+			else if (/Android/.test(ua)) dev.textContent = 'Android';
+			else if (/Windows/.test(ua)) dev.textContent = 'WinPC';
+			else if (/Macintosh/.test(ua)) dev.textContent = 'Mac';
+			else if (/Linux/.test(ua)) dev.textContent = 'Linux';
+			else dev.textContent = 'N/A';
+		}
+		
+		function updateNetworkInfo() {
+			var net = document.getElementById('api-net');
+			var sys = document.getElementById('api-sys');
+			
+			if (navigator.onLine) {
+				sys.textContent = 'ONLINE';
+				sys.style.color = '#6c6';
+				if (navigator.connection) {
+					var conn = navigator.connection;
+					var type = conn.effectiveType || 'unknown';
+					var downlink = conn.downlink ? conn.downlink.toFixed(1) : '?';
+					net.textContent = type.toUpperCase() + ' ' + downlink + 'Mb';
+				} else {
+					net.textContent = 'ONLINE';
+				}
+			} else {
+				sys.textContent = 'OFFLINE';
+				sys.style.color = '#c66';
+				net.textContent = 'OFFLINE';
+			}
+		}
+		
+		function updateScreenInfo() {
+			var scr = document.getElementById('api-scr');
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+			var dpr = window.devicePixelRatio || 1;
+			scr.textContent = w + 'x' + h + ' ' + dpr.toFixed(1) + 'x';
+		}
+		
+		function updateBatteryInfo() {
+			var batt = document.getElementById('api-batt');
+			if ('getBattery' in navigator) {
+				navigator.getBattery().then(function(battery) {
+					var level = Math.round(battery.level * 100);
+					var charging = battery.charging ? '⚡' : '';
+					batt.textContent = level + '%' + charging;
+					if (level <= 20) batt.style.color = '#c66';
+					else if (level <= 50) batt.style.color = '#f96';
+					else batt.style.color = '';
+				}).catch(function() {
+					batt.textContent = 'N/A';
+				});
+			} else {
+				batt.textContent = 'N/A';
+			}
+		}
+		
+		function updateMemoryInfo() {
+			var mem = document.getElementById('api-mem');
+			if (performance.memory) {
+				var usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+				var totalMB = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
+				mem.textContent = usedMB + 'MB/' + totalMB + 'MB';
+			} else {
+				mem.textContent = 'N/A';
+			}
+		}
+		
+		var pageLoadTime = Date.now();
+		function updateUptime() {
+			var uptime = document.getElementById('api-uptime');
+			var elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
+			var hours = Math.floor(elapsed / 3600);
+			var minutes = Math.floor((elapsed % 3600) / 60);
+			var seconds = elapsed % 60;
+			uptime.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+		}
+		
+		function updateLanguage() {
+			var lang = document.getElementById('api-lang');
+			lang.textContent = navigator.language || 'N/A';
+		}
+		
+		function updateUserAgent() {
+			var ua = document.getElementById('api-ua');
+			var browser = 'N/A';
+			var userAgent = navigator.userAgent;
+			if (/Chrome/.test(userAgent) && !/Edg/.test(userAgent)) browser = 'Chrome';
+			else if (/Firefox/.test(userAgent)) browser = 'Firefox';
+			else if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) browser = 'Safari';
+			else if (/Edg/.test(userAgent)) browser = 'Edge';
+			ua.textContent = browser;
+		}
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			var creds = NovelAPI.getStoredCredentials();
+			
+			if (creds.apiKey) { 
+				document.getElementById('apiKey').value = creds.apiKey; 
+				document.getElementById('currentKey').textContent = '已配置'; 
+			}
+			if (creds.apiPass) { 
+				document.getElementById('apiPass').value = creds.apiPass; 
+				document.getElementById('currentPass').textContent = '已配置'; 
+			}
+			
+			initDynamicData();
+		});
+	</script>
+	
+	<div class="headtrim"> </div>
+	<div class="baseboard"> </div>
+</body>
+</html>

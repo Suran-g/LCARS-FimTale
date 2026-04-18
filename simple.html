@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Simple Test</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body {
+			background-color: black;
+			color: #c9f;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 20px;
+		}
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+		.header {
+			background-color: #89f;
+			color: black;
+			padding: 20px;
+			border-radius: 0 0 0 100px;
+			margin-bottom: 10px;
+		}
+		.banner {
+			font-size: 3rem;
+			text-transform: uppercase;
+			color: #f80;
+			font-weight: bold;
+		}
+		.main-content {
+			display: flex;
+			gap: 20px;
+		}
+		.sidebar {
+			width: 200px;
+			background-color: #c44;
+			padding: 20px;
+			border-radius: 100px 0 0 0;
+			color: black;
+			font-weight: bold;
+		}
+		.content {
+			flex: 1;
+		}
+		h1 { color: #fa0; }
+		h2 { color: #c9f; }
+		h3 { color: #f80; }
+		.novel-card {
+			background-color: rgba(201, 153, 255, 0.1);
+			border-left: 4px solid #c9f;
+			padding: 15px;
+			margin: 10px 0;
+			cursor: pointer;
+		}
+		.novel-card h4 {
+			color: #c9f;
+			margin: 0 0 10px 0;
+		}
+		.nav-btn {
+			background-color: #c9f;
+			color: black;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 20px;
+			font-weight: bold;
+			cursor: pointer;
+			margin-right: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>NOVEL READER</h1>
+		</div>
+		
+		<div class="banner">LCARS NOVEL READER</div>
+		
+		<div style="margin: 10px 0;">
+			<button class="nav-btn" onclick="navigateTo('novel-reader.html')">READER</button>
+			<button class="nav-btn" onclick="navigateTo('apikey-login.html')">API KEY</button>
+		</div>
+		
+		<div class="main-content">
+			<div class="sidebar">
+				<div>01 - MAIN</div>
+				<div>02 - READER</div>
+				<div>03 - API KEY</div>
+				<div>04 - FANTASY</div>
+				<div>05 - SCI-FI</div>
+			</div>
+			
+			<div class="content">
+				<h1>Welcome to LCARS Novel Reader</h1>
+				<h2>Your Gateway to Infinite Stories</h2>
+				
+				<h3>FEATURED NOVELS</h3>
+				<div class="novel-card" onclick="navigateTo('novel-reader.html')">
+					<h4>The Chronicles of Starlight</h4>
+					<p>An epic fantasy adventure spanning the ages.</p>
+					<p style="color: #f80;">Author: Alexandria Rivers | Rating: 4.9</p>
+				</div>
+				<div class="novel-card" onclick="navigateTo('novel-reader.html')">
+					<h4>Echoes of the Void</h4>
+					<p>A sci-fi journey through uncharted galaxies.</p>
+					<p style="color: #f80;">Author: Marcus Chen | Rating: 4.8</p>
+				</div>
+				
+				<h3>RECENT UPDATES</h3>
+				<ul style="list-style: none; padding: 0;">
+					<li style="padding: 10px; border-left: 4px solid #89f; margin: 5px 0; cursor: pointer;" onclick="navigateTo('novel-reader.html')">
+						<strong>Whispers from the Abyss</strong>
+						<p style="color: #668; margin: 5px 0;">New Chapter: 45 | 1 hour ago</p>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		function navigateTo(url) {
+			window.location.href = url;
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>LCARS Full Test</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		:root {
+			--african-violet: #c9f;
+			--bluey: #89f;
+			--orange: #f80;
+			--red: #c44;
+			--gold: #fa0;
+			--butterscotch: #f96;
+			--gray: #668;
+			--font-color: #c9f;
+			--lfw: 240px;
+		}
+		
+		* {
+			box-sizing: border-box;
+		}
+		
+		html {
+			scroll-behavior: smooth;
+		}
+		
+		body {
+			background-color: black;
+			font-family: Arial, sans-serif;
+			color: var(--font-color);
+			margin: 0;
+			padding: 10px 0 0 5px;
+			display: block;
+		}
+		
+		.wrap-standard {
+			width: 100%;
+		}
+		
+		.wrap {
+			display: flex;
+			margin-inline: auto;
+			padding-left: 5px;
+			padding-right: 15px;
+			overflow: hidden;
+		}
+		
+		.left-frame-top {
+			width: var(--lfw);
+			text-align: right;
+			font-weight: bold;
+			color: black;
+			background-color: var(--bluey);
+			border-radius: 0 0 0 160px;
+			padding: 1rem;
+		}
+		
+		.right-frame-top {
+			flex: 1;
+			padding-left: 1rem;
+		}
+		
+		.banner {
+			font-size: 2rem;
+			color: var(--orange);
+			text-transform: uppercase;
+			font-weight: bold;
+		}
+		
+		nav {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 1rem;
+		}
+		
+		nav button {
+			padding: 0.5rem 1rem;
+			background-color: var(--african-violet);
+			border: none;
+			border-radius: 20px;
+			color: black;
+			font-weight: bold;
+			cursor: pointer;
+		}
+		
+		.data-cascade-wrapper {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+		
+		.data-column {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+		}
+		
+		.left-frame {
+			width: var(--lfw);
+			background-color: var(--red);
+			border-radius: 160px 0 0 0;
+			padding: 1rem;
+			text-align: right;
+			font-weight: bold;
+			color: black;
+		}
+		
+		.right-frame {
+			flex: 1;
+			padding: 1rem;
+		}
+		
+		main {
+			margin-top: 1rem;
+		}
+		
+		h1 {
+			color: var(--gold);
+			font-size: 2rem;
+		}
+		
+		h2 {
+			color: var(--african-violet);
+		}
+		
+		h3 {
+			color: var(--orange);
+		}
+		
+		.novel-card {
+			background-color: rgba(201, 153, 255, 0.1);
+			border-left: 4px solid var(--african-violet);
+			padding: 1rem;
+			margin: 1rem 0;
+			cursor: pointer;
+		}
+		
+		.novel-card h4 {
+			color: var(--african-violet);
+			margin: 0 0 0.5rem 0;
+		}
+		
+		.novel-card p {
+			margin: 0 0 0.5rem 0;
+		}
+		
+		.meta-info {
+			color: var(--orange);
+			font-size: 0.9rem;
+		}
+		
+		.content-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		
+		.content-list li {
+			display: flex;
+			flex-direction: column;
+			padding: 1rem;
+			margin-bottom: 0.5rem;
+			background-color: rgba(136, 153, 255, 0.05);
+			border-left: 4px solid var(--bluey);
+			cursor: pointer;
+		}
+		
+		.list-title {
+			font-weight: bold;
+			color: var(--african-violet);
+		}
+		
+		.list-meta {
+			font-size: 0.875rem;
+			color: var(--gray);
+			margin-top: 0.25rem;
+		}
+		
+		.category-grid {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.75rem;
+			margin-block: 1.5rem;
+		}
+		
+		.category-btn {
+			min-width: 140px;
+			height: 56px;
+			padding: 0 1.5rem;
+			background-color: var(--african-violet);
+			border: none;
+			border-radius: 100vmax;
+			font-weight: bold;
+			text-transform: uppercase;
+			color: black;
+			cursor: pointer;
+		}
+		
+		.lcars-bar {
+			height: 20px;
+			background: linear-gradient(to right, var(--bluey), var(--african-violet));
+			margin: 1.5rem 0;
+		}
+		
+		.font-gold { color: var(--gold); }
+		.font-orange { color: var(--orange); }
+		.font-african-violet { color: var(--african-violet); }
+		.font-bluey { color: var(--bluey); }
+		.font-butterscotch { color: var(--butterscotch); }
+		
+		@media (max-width: 950px) {
+			:root { --lfw: 150px; }
+		}
+		
+		@media (max-width: 750px) {
+			:root { --lfw: 120px; }
+			.wrap {
+				flex-direction: column;
+			}
+			.left-frame, .left-frame-top {
+				width: 100%;
+				border-radius: 0;
+				text-align: left;
+			}
+			.category-btn {
+				min-width: 120px;
+				height: 48px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<section class="wrap-standard">
+		<div class="wrap">
+			<div class="left-frame-top">
+				<button onclick="navigateTo('novel-reader.html')" style="background: transparent; border: none; font-weight: bold; cursor: pointer;">NOVEL</button>
+				<div>01<span style="color: #668;">-MAIN</span></div>
+			</div>
+			<div class="right-frame-top">
+				<div class="banner">LCARS &#149; NOVEL READER</div>
+				<div class="data-cascade-wrapper">
+					<div class="data-column">
+						<div>SYS</div><div>NET</div><div>API</div><div>DATA</div><div>USER</div>
+					</div>
+					<div class="data-column">
+						<div>ONLINE</div><div>ACTIVE</div><div style="color: #993;">READY</div><div>LOADED</div><div>GUEST</div>
+					</div>
+				</div>
+				<nav>
+					<button onclick="navigateTo('novel-reader.html')">READER</button>
+					<button onclick="navigateTo('apikey-login.html')">API KEY</button>
+					<button onclick="showCategory('fantasy')">FANTASY</button>
+					<button onclick="showCategory('scifi')">SCIFI</button>
+				</nav>
+			</div>
+		</div>
+		<div class="wrap" style="margin-top: 10px;">
+			<div class="left-frame">
+				<div onclick="navigateTo('novel-reader.html')" style="cursor: pointer;">03-READER</div>
+				<div onclick="navigateTo('apikey-login.html')" style="cursor: pointer;">04-API KEY</div>
+				<div onclick="showCategory('fantasy')" style="cursor: pointer;">05-FANTASY</div>
+				<div onclick="showCategory('scifi')" style="cursor: pointer;">06-SCI-FI</div>
+				<div onclick="showCategory('romance')" style="cursor: pointer;">07-ROMANCE</div>
+				<div onclick="showCategory('action')" style="cursor: pointer;">08-ACTION</div>
+			</div>
+			<div class="right-frame">
+				<main>
+					<h1 class="font-gold">Welcome to LCARS Novel Reader</h1>
+					<h2>Your Gateway to Infinite Stories</h2>
+					
+					<div class="lcars-bar"></div>
+					
+					<h3 class="font-orange">FEATURED NOVELS</h3>
+					<div class="novel-card" onclick="openNovel('18405')">
+						<h4 class="font-african-violet">The Chronicles of Starlight</h4>
+						<p>An epic fantasy adventure spanning the ages.</p>
+						<span class="meta-info">Author: Alexandria Rivers | Rating: 4.9</span>
+					</div>
+					<div class="novel-card" onclick="openNovel('18406')">
+						<h4 class="font-bluey">Echoes of the Void</h4>
+						<p>A sci-fi journey through uncharted galaxies.</p>
+						<span class="meta-info">Author: Marcus Chen | Rating: 4.8</span>
+					</div>
+					
+					<div class="lcars-bar"></div>
+					
+					<h3 class="font-orange">RECENT UPDATES</h3>
+					<ul class="content-list">
+						<li onclick="openNovel('18408')">
+							<span class="list-title">Whispers from the Abyss</span>
+							<span class="list-meta">New Chapter: 45 | 1 hour ago</span>
+						</li>
+						<li onclick="openNovel('18409')">
+							<span class="list-title">Kingdom of Shadows</span>
+							<span class="list-meta">New Chapter: 23 | 3 hours ago</span>
+						</li>
+					</ul>
+					
+					<div class="lcars-bar"></div>
+					
+					<h3 class="font-orange">GENRE CATEGORIES</h3>
+					<div class="category-grid">
+						<button class="category-btn" onclick="showCategory('fantasy')">FANTASY</button>
+						<button class="category-btn" onclick="showCategory('scifi')">SCI-FI</button>
+						<button class="category-btn" onclick="showCategory('romance')">ROMANCE</button>
+						<button class="category-btn" onclick="showCategory('action')">ACTION</button>
+					</div>
+					
+					<div id="category-content" style="display: none;">
+						<h4 id="category-title" class="font-gold"></h4>
+						<ul id="category-list" class="content-list"></ul>
+					</div>
+				</main>
+				<footer>
+					Content &copy; 2024 LCARS Novel Reader<br>
+					LCARS Inspired Website Template
+				</footer>
+			</div>
+		</div>
+	</section>
+	
+	<script>
+		function playSound(audioId) {
+			try {
+				const audio = document.getElementById(audioId);
+				if (audio) {
+					audio.currentTime = 0;
+					audio.play().catch(function() {});
+				}
+			} catch(e) {}
+		}
+		
+		function navigateTo(url) {
+			playSound('audio2');
+			setTimeout(function() {
+				window.location.href = url;
+			}, 200);
+		}
+		
+		function openNovel(novelId) {
+			playSound('audio2');
+			window.location.href = 'novel-reader.html?id=' + novelId;
+		}
+		
+		function showCategory(category) {
+			playSound('audio2');
+			
+			const categories = {
+				fantasy: {
+					title: 'FANTASY NOVELS',
+					novels: [
+						{ id: '18405', title: 'The Chronicles of Starlight', author: 'Alexandria Rivers', rating: '4.9' },
+						{ id: '18407', title: 'The Last Dragon Prince', author: 'Sarah Montgomery', rating: '4.7' }
+					]
+				},
+				scifi: {
+					title: 'SCI-FI NOVELS',
+					novels: [
+						{ id: '18406', title: 'Echoes of the Void', author: 'Marcus Chen', rating: '4.8' }
+					]
+				},
+				romance: {
+					title: 'ROMANCE NOVELS',
+					novels: [
+						{ id: '18411', title: 'Heart of the Ocean', author: 'Amanda Lee', rating: '4.6' }
+					]
+				},
+				action: {
+					title: 'ACTION NOVELS',
+					novels: [
+						{ id: '18413', title: 'Shadow Warrior', author: 'David Kim', rating: '4.7' }
+					]
+				}
+			};
+			
+			const catData = categories[category];
+			if (!catData) return;
+			
+			document.getElementById('category-title').textContent = catData.title;
+			
+			const listElement = document.getElementById('category-list');
+			listElement.innerHTML = '';
+			
+			catData.novels.forEach(function(novel) {
+				const li = document.createElement('li');
+				li.innerHTML = '<span class="list-title">' + novel.title + '</span><span class="list-meta">' + novel.author + ' | ' + novel.rating + '</span>';
+				li.onclick = function() { openNovel(novel.id); };
+				listElement.appendChild(li);
+			});
+			
+			document.getElementById('category-content').style.display = 'block';
+		}
+	</script>
+</body>
+</html>
