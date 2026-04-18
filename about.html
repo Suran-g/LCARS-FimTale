@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>About This Project</title>
+	<link rel="stylesheet" type="text/css" href="assets/classic.css">
+	<style>
+		.about-container {
+			max-width: 900px;
+			margin: 2rem auto;
+			padding: 2rem;
+		}
+		
+		.about-title {
+			color: #f96;
+			font-size: 2rem;
+			margin-bottom: 1rem;
+			border-bottom: 3px solid #f96;
+			padding-bottom: 0.5rem;
+		}
+		
+		.about-section {
+			margin-bottom: 2.5rem;
+			padding: 1.5rem;
+			background: rgba(201, 153, 255, 0.1);
+			border-left: 4px solid #c9f;
+			border-radius: 8px;
+		}
+		
+		.about-section h2 {
+			color: #f96;
+			font-size: 1.5rem;
+			margin-bottom: 1rem;
+			margin-top: 0;
+		}
+		
+		.about-section h3 {
+			color: #89f;
+			font-size: 1.2rem;
+			margin-top: 1.5rem;
+			margin-bottom: 0.5rem;
+		}
+		
+		.about-section p {
+			line-height: 1.8;
+			margin-bottom: 1rem;
+		}
+		
+		.about-section ul {
+			margin-left: 1.5rem;
+			margin-bottom: 1rem;
+		}
+		
+		.about-section ul li {
+			line-height: 1.8;
+			margin-bottom: 0.5rem;
+		}
+		
+		.about-section a {
+			color: #89f;
+			text-decoration: none;
+		}
+		
+		.about-section a:hover {
+			color: #c9f;
+			text-decoration: underline;
+		}
+		
+		.about-highlight {
+			background: rgba(249, 153, 102, 0.1);
+			padding: 1rem;
+			border-radius: 8px;
+			margin: 1rem 0;
+			border-left: 4px solid #f96;
+		}
+		
+		.about-highlight p {
+			margin: 0.5rem 0;
+		}
+		
+		.about-credits {
+			text-align: center;
+			padding: 2rem;
+			margin-top: 3rem;
+			border-top: 2px solid rgba(201, 153, 255, 0.3);
+		}
+		
+		.about-credits p {
+			margin: 0.5rem 0;
+		}
+		
+		@media (max-width: 750px) {
+			.about-container {
+				padding: 1rem;
+			}
+			
+			.about-title {
+				font-size: 1.5rem;
+			}
+			
+			.about-section {
+				padding: 1rem;
+			}
+			
+			.data-cascade-wrapper {
+				transform: scale(0.85);
+				transform-origin: top left;
+			}
+			
+			.data-cascade-wrapper .data-column div {
+				font-size: 0.7rem;
+				padding: 0.2rem 0.4rem;
+			}
+		}
+		
+		@media (max-width: 600px) {
+			.data-cascade-wrapper {
+				transform: scale(0.75);
+			}
+			
+			.data-cascade-button-group {
+				flex-direction: column;
+			}
+			
+			.data-cascade-button-group nav {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.3rem;
+			}
+			
+			.data-cascade-button-group nav button {
+				flex: 1 1 auto;
+				min-width: 4rem;
+				font-size: 0.8rem;
+			}
+		}
+		
+		@media (max-width: 480px) {
+			.data-cascade-wrapper {
+				transform: scale(0.65);
+				max-height: 120px;
+				overflow: hidden;
+			}
+			
+			.data-cascade-wrapper .dc-row-5 {
+				display: none;
+			}
+		}
+	</style>
+</head>
+<body>
+	<audio id="audio1" src="assets/beep1.mp3" preload="auto"></audio>
+	<audio id="audio2" src="assets/beep2.mp3" preload="auto"></audio>
+	<audio id="audio3" src="assets/beep3.mp3" preload="auto"></audio>
+
+	<div class="wrap-everything">
+		<section id="column-1">
+			<div class="lcars-frame">
+				<div class="bar-frame-top"></div>
+				<div class="bar-frame"></div>
+			</div>
+		</section>
+		
+		<section id="column-2"></section>
+		
+		<section id="column-3">
+			<div class="wrap">
+				<div class="left-frame-top">
+					<button onclick="playSoundAndRedirect('audio1', 'classic-standard.html')" class="panel-1-button">HOME</button>
+					<div class="panel-2">05<span class="hop">-ABOUT</span></div>
+				</div>
+				<div class="right-frame-top">
+					<div class="banner">LCARS &#149; ABOUT</div>
+					<div class="data-cascade-button-group">
+						<div class="data-cascade-wrapper" id="about-data">
+							<div class="data-column">
+								<div class="dc-row-1">SYS</div>
+								<div class="dc-row-1">MODE</div>
+								<div class="dc-row-2">TIME</div>
+								<div class="dc-row-3">DATE</div>
+								<div class="dc-row-3">NET</div>
+								<div class="dc-row-4">DEV</div>
+								<div class="dc-row-5">SCR</div>
+								<div class="dc-row-1">MEM</div>
+								<div class="dc-row-2">BATT</div>
+								<div class="dc-row-3">UPTIME</div>
+								<div class="dc-row-4">LANG</div>
+								<div class="dc-row-5">UA</div>
+							</div>
+							<div class="dc-spacer"></div>
+							<div class="data-column">
+								<div class="dc-row-1" id="about-sys">ONLINE</div>
+								<div class="dc-row-1" id="about-mode">ABOUT</div>
+								<div class="dc-row-2" id="about-time">--:--:--</div>
+								<div class="dc-row-3" id="about-date">----/--/--</div>
+								<div class="dc-row-3" id="about-net">---</div>
+								<div class="dc-row-4" id="about-dev">---</div>
+								<div class="dc-row-5" id="about-scr">---</div>
+								<div class="dc-row-1" id="about-mem">N/A</div>
+								<div class="dc-row-2" id="about-batt">N/A</div>
+								<div class="dc-row-3" id="about-uptime">---</div>
+								<div class="dc-row-4" id="about-lang">---</div>
+								<div class="dc-row-5" id="about-ua">---</div>
+							</div>
+						</div>
+						<nav> 
+							<button onclick="window.location.href='classic-standard.html'">HOME</button>
+							<button onclick="window.location.href='novel-reader.html'">READER</button>
+							<button onclick="window.location.href='api-config.html'">API</button>
+							<button onclick="playSoundAndRedirect('audio2', 'index.html')">BACK</button>
+						</nav>
+					</div>
+					<div class="bar-panel first-bar-panel">
+						<div class="bar-1"></div>
+						<div class="bar-2"></div>
+						<div class="bar-3"></div>
+						<div class="bar-4"></div>
+						<div class="bar-5"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="wrap" id="gap">
+				<div class="left-frame">
+					<button onclick="topFunction(); playSound('audio3')" id="topBtn"><span class="hop">screen</span> top</button>
+					<div>
+						<div class="panel-3" onclick="playSoundAndRedirect('audio2', 'classic-standard.html')">01<span class="hop">-HOME</span></div>
+						<div class="panel-4" onclick="playSoundAndRedirect('audio2', 'novel-reader.html')">02<span class="hop">-READER</span></div>
+						<div class="panel-5" onclick="playSoundAndRedirect('audio2', 'api-config.html')">03<span class="hop">-API KEY</span></div>
+						<div class="panel-6" onclick="playSoundAndRedirect('audio2', 'novel-reader.html')">04<span class="hop">-SEARCH</span></div>
+						<div class="panel-7">05<span class="hop">-ABOUT</span></div>
+					</div>
+					<div>
+						<div class="panel-8">06<span class="hop">-CONFIG</span></div>
+						<div class="panel-9">07<span class="hop">-EXIT</span></div>
+						<div class="panel-10">08<span class="hop">-STATUS</span></div>
+					</div>
+				</div>
+				
+				<div class="right-frame">
+					<div class="bar-panel">
+						<div class="bar-6"></div>
+						<div class="bar-7"></div>
+						<div class="bar-8"></div>
+						<div class="bar-9"></div>
+						<div class="bar-10"></div>
+					</div>
+					
+					<main class="reader-content">
+						<div class="about-container">
+							<h1 class="about-title">About This Project</h1>
+							
+							<div class="about-section">
+								<h2>1. 项目目的</h2>
+								<p>本网站是基于 LCARS Inspired Website Template 构建的一个非商业演示项目。</p>
+								
+								<h3>主要目标是：</h3>
+								<ul>
+									<li>展示 LCARS 风格的视觉界面；</li>
+									<li>通过调用 FiMTale（<a href="https://fimtale.com" target="_blank">https://fimtale.com</a>）提供的公开 API，实现动态数据展示或交互效果；</li>
+									<li>作为个人技术学习与兴趣实践，不涉及任何营利行为。</li>
+								</ul>
+							</div>
+							
+							<div class="about-section">
+								<h2>2. 模板来源与署名</h2>
+								<p>本网站使用的视觉模板来自：</p>
+								
+								<div class="about-highlight">
+									<p><strong>LCARS Inspired Website Template</strong> – Jim Robertus</p>
+									<p>官方网站：<a href="https://www.thelcars.com" target="_blank">https://www.thelcars.com</a></p>
+								</div>
+								
+								<p>根据原作者发布的最终用户许可协议（EULA），本人已：</p>
+								<ul>
+									<li>在网站页脚（或显著位置）提供指向 <a href="https://www.thelcars.com" target="_blank">https://www.thelcars.com</a> 的可点击链接；</li>
+									<li>注明本网站对原始模板进行了修改（包括样式适配、页面结构调整及 API 集成）；</li>
+									<li>严格遵守"仅限非商业个人使用"的规定。</li>
+								</ul>
+								
+								<div class="about-highlight">
+									<p><strong>署名示例（已置于本网站底部）：</strong></p>
+									<p><em>LCARS Inspired Website Template by www.TheLCARS.com, with modifications.</em></p>
+								</div>
+							</div>
+							
+							<div class="about-section">
+								<h2>3. 外部 API 使用说明</h2>
+								<p>本网站会调用 FiMTale 提供的公开 API。</p>
+								<p>调用目的仅为获取特定数据（例如作品信息、用户公开内容等），用于在 LCARS 风格界面中展示。</p>
+								
+								<ul>
+									<li>所有 API 调用均遵循 FiMTale 的使用条款；</li>
+									<li>本网站不存储、转发或商用 API 返回的任何数据；</li>
+									<li>若 FiMTale 官方调整 API 策略或要求停止调用，本人将立即配合修改。</li>
+								</ul>
+							</div>
+							
+							<div class="about-section">
+								<h2>4. 非商业声明</h2>
+								<p>本网站 <strong>不包含任何形式的商业内容</strong>，包括但不限于：</p>
+								<ul>
+									<li>广告（Google AdSense、联盟广告等）；</li>
+									<li>商品或服务销售；</li>
+									<li>付费会员/订阅；</li>
+									<li>捐赠或打赏按钮；</li>
+									<li>为本人或第三方的商业业务引流。</li>
+								</ul>
+								
+								<div class="about-highlight">
+									<p>本网站完全为个人兴趣、技术学习与 LCARS 风格爱好者交流而创建。</p>
+								</div>
+							</div>
+							
+							<div class="about-section">
+								<h2>5. 版权与许可声明</h2>
+								<ul>
+									<li><strong>LCARS 视觉风格</strong> 属于《星际迷航》CBS Studios Inc. 的商标/设计，原作者 Jim Robertus 已声明其网站与 CBS 无关联。本网站仅作非商业爱好者展示，不主张任何相关权利。</li>
+									<li><strong>原始模板代码</strong> 版权归 Jim Robertus 所有，使用行为遵守其 EULA。</li>
+									<li>本网站中由本人编写的修改代码（包括 API 集成、页面布局调整等）遵循与原模板相同的许可条款（即 EULA 规定的衍生作品同样受本协议约束）。</li>
+									<li><strong>FiMTale</strong> 网站及其 API 的相关权利归其运营方所有。</li>
+								</ul>
+							</div>
+							
+							<div class="about-section">
+								<h2>6. 联系方式</h2>
+								<p>若对本网站的使用有任何疑问（例如是否违反模板许可或 API 使用规范），请通过以下方式联系本人：</p>
+								
+								<div class="about-highlight">
+									<p><strong>Email:</strong> <a href="mailto:suran_chanxi@outlook.com">suran_chanxi@outlook.com</a></p>
+								</div>
+								
+								<p>本网站仅为个人非商业项目。若原作者 Jim Robertus 或 FiMTale 运营方认为本网站有任何不妥，本人将根据要求立即调整或关闭网站。</p>
+							</div>
+							
+							<div class="about-credits">
+								<p><strong>LCARS Inspired Website Template by <a href="https://www.thelcars.com" target="_blank">www.TheLCARS.com</a>, with modifications.</strong></p>
+								<p>Content &copy; 2024 LCARS Novel Reader</p>
+								<p style="margin-top: 1rem; font-size: 0.85rem; color: #668;">This is a non-commercial fan project for educational and personal use only.</p>
+							</div>
+						</div>
+					</main>
+					
+					<footer>
+						Content &copy; 2024 LCARS Novel Reader<br>
+						LCARS Inspired Website Template by <a href="https://www.thelcars.com">www.TheLCARS.com</a>
+					</footer>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+	<script type="text/javascript" src="assets/lcars.js"></script>
+	<script type="text/javascript">
+		/**
+		 * 初始化动态数据更新
+		 */
+		function initDynamicData() {
+			updateTime();
+			updateDeviceInfo();
+			updateNetworkInfo();
+			updateScreenInfo();
+			updateBatteryInfo();
+			updateMemoryInfo();
+			updateUptime();
+			updateLanguage();
+			updateUserAgent();
+			
+			setInterval(updateTime, 1000);
+			setInterval(updateNetworkInfo, 10000);
+			setInterval(updateBatteryInfo, 30000);
+			setInterval(updateMemoryInfo, 30000);
+			setInterval(updateUptime, 1000);
+			setInterval(updateScreenInfo, 5000);
+			
+			window.addEventListener('resize', updateScreenInfo);
+			window.addEventListener('online', updateNetworkInfo);
+			window.addEventListener('offline', updateNetworkInfo);
+		}
+		
+		function updateTime() {
+			var now = new Date();
+			var h = String(now.getHours()).padStart(2, '0');
+			var m = String(now.getMinutes()).padStart(2, '0');
+			var s = String(now.getSeconds()).padStart(2, '0');
+			document.getElementById('about-time').textContent = h + ':' + m + ':' + s;
+			
+			var y = now.getFullYear();
+			var mo = String(now.getMonth() + 1).padStart(2, '0');
+			var d = String(now.getDate()).padStart(2, '0');
+			document.getElementById('about-date').textContent = y + '/' + mo + '/' + d;
+		}
+		
+		function updateDeviceInfo() {
+			var dev = document.getElementById('about-dev');
+			var ua = navigator.userAgent;
+			if (/iPad/.test(ua)) dev.textContent = 'iPad';
+			else if (/iPhone/.test(ua)) dev.textContent = 'iPhone';
+			else if (/Android/.test(ua)) dev.textContent = 'Android';
+			else if (/Windows/.test(ua)) dev.textContent = 'WinPC';
+			else if (/Macintosh/.test(ua)) dev.textContent = 'Mac';
+			else if (/Linux/.test(ua)) dev.textContent = 'Linux';
+			else dev.textContent = 'N/A';
+		}
+		
+		function updateNetworkInfo() {
+			var net = document.getElementById('about-net');
+			var sys = document.getElementById('about-sys');
+			
+			if (navigator.onLine) {
+				sys.textContent = 'ONLINE';
+				sys.style.color = '#6c6';
+				if (navigator.connection) {
+					var conn = navigator.connection;
+					var type = conn.effectiveType || 'unknown';
+					var downlink = conn.downlink ? conn.downlink.toFixed(1) : '?';
+					net.textContent = type.toUpperCase() + ' ' + downlink + 'Mb';
+				} else {
+					net.textContent = 'ONLINE';
+				}
+			} else {
+				sys.textContent = 'OFFLINE';
+				sys.style.color = '#c66';
+				net.textContent = 'OFFLINE';
+			}
+		}
+		
+		function updateScreenInfo() {
+			var scr = document.getElementById('about-scr');
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+			var dpr = window.devicePixelRatio || 1;
+			scr.textContent = w + 'x' + h + ' ' + dpr.toFixed(1) + 'x';
+		}
+		
+		function updateBatteryInfo() {
+			var batt = document.getElementById('about-batt');
+			if ('getBattery' in navigator) {
+				navigator.getBattery().then(function(battery) {
+					var level = Math.round(battery.level * 100);
+					var charging = battery.charging ? '⚡' : '';
+					batt.textContent = level + '%' + charging;
+					if (level <= 20) batt.style.color = '#c66';
+					else if (level <= 50) batt.style.color = '#f96';
+					else batt.style.color = '';
+				}).catch(function() {
+					batt.textContent = 'N/A';
+				});
+			} else {
+				batt.textContent = 'N/A';
+			}
+		}
+		
+		function updateMemoryInfo() {
+			var mem = document.getElementById('about-mem');
+			if (performance.memory) {
+				var usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+				var totalMB = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
+				mem.textContent = usedMB + 'MB/' + totalMB + 'MB';
+			} else {
+				mem.textContent = 'N/A';
+			}
+		}
+		
+		var pageLoadTime = Date.now();
+		function updateUptime() {
+			var uptime = document.getElementById('about-uptime');
+			var elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
+			var hours = Math.floor(elapsed / 3600);
+			var minutes = Math.floor((elapsed % 3600) / 60);
+			var seconds = elapsed % 60;
+			uptime.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+		}
+		
+		function updateLanguage() {
+			var lang = document.getElementById('about-lang');
+			lang.textContent = navigator.language || 'N/A';
+		}
+		
+		function updateUserAgent() {
+			var ua = document.getElementById('about-ua');
+			var browser = 'N/A';
+			var userAgent = navigator.userAgent;
+			if (/Chrome/.test(userAgent) && !/Edg/.test(userAgent)) browser = 'Chrome';
+			else if (/Firefox/.test(userAgent)) browser = 'Firefox';
+			else if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) browser = 'Safari';
+			else if (/Edg/.test(userAgent)) browser = 'Edge';
+			ua.textContent = browser;
+		}
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			initDynamicData();
+		});
+	</script>
+	
+	<div class="headtrim"> </div>
+	<div class="baseboard"> </div>
+</body>
+</html>
