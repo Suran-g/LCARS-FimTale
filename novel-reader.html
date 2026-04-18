@@ -442,12 +442,7 @@
  			min-width: 100%;
  		}
 		
-		/* 响应式data-cascade布局调整 */
-		.data-cascade-wrapper {
-			transform: scale(0.85);
-			transform-origin: top left;
-		}
-		
+		/* 响应式data-cascade字体调整 */
 		.data-cascade-wrapper .data-column div {
 			font-size: 0.7rem;
 			padding: 0.2rem 0.4rem;
@@ -455,10 +450,6 @@
 	}
 	
 	@media (max-width: 600px) {
-		.data-cascade-wrapper {
-			transform: scale(0.75);
-		}
-		
 		.data-cascade-button-group {
 			flex-direction: column;
 		}
@@ -478,7 +469,6 @@
 	
 	@media (max-width: 480px) {
 		.data-cascade-wrapper {
-			transform: scale(0.65);
 			max-height: 120px;
 			overflow: hidden;
 		}
@@ -486,6 +476,28 @@
 		/* 隐藏部分次要数据行 */
 		.data-cascade-wrapper .dc-row-5 {
 			display: none;
+		}
+		
+		/* 章节导航按钮移动端适配 */
+		.chapter-navigation {
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+		
+		.chapter-btn {
+			width: 100%;
+			padding: 0.65rem 1rem;
+			font-size: 0.9rem;
+			text-align: center;
+		}
+		
+		/* 搜索框移动端适配 */
+		.search-container {
+			flex-direction: column;
+		}
+		
+		.search-btn {
+			width: 100%;
 		}
 	}
 	</style>
@@ -1231,32 +1243,91 @@
 			document.getElementById('novel-body').innerHTML = '<p>This is the first chapter of the novel. The protagonist begins his adventure journey here. The story takes place on a distant planet, full of mystery and unknown challenges.</p><p>As the plot develops, the protagonist will face various trials and choices. Each choice will affect the direction and ending of the story.</p><p>In this imaginative world, readers will follow the protagonist to explore unknown areas, solve puzzles one by one, and discover hidden secrets.</p>';
 		}
 		
+		/**
+		 * 加载章节列表/目录
+		 */
 		function loadNovelList() {
+			document.getElementById('loading-indicator').style.display = 'none';
 			document.getElementById('novel-display').style.display = 'none';
 			document.getElementById('novel-list-section').style.display = 'block';
 			document.getElementById('hot-section').style.display = 'none';
 			document.getElementById('latest-section').style.display = 'none';
+			document.getElementById('default-section').style.display = 'none';
+			document.getElementById('search-section').style.display = 'none';
 			
-			document.getElementById('dc-mode').textContent = 'LIST';
-			
-			novelListData = [
-				{ id: '76448', title: 'Selected Works', author: 'Unknown Author', rating: '5.0', views: '10000+' },
-				{ id: '18405', title: 'Starlight Chronicle', author: 'Star Walker', rating: '4.9', views: '326,027' },
-				{ id: '18406', title: 'Void Echo', author: 'Chen Mo', rating: '4.8', views: '156,890' },
-				{ id: '18407', title: 'The Last Dragon Prince', author: 'Meng Xi', rating: '4.7', views: '89,456' },
-				{ id: '18408', title: 'Abyss Whispers', author: 'Dark Wanderer', rating: '4.6', views: '67,234' },
-				{ id: '4', title: 'Test Novel', author: 'Test Author', rating: '4.0', views: '12,345' }
-			];
+			document.getElementById('dc-mode').textContent = 'CATALOG';
 			
 			var list = document.getElementById('catalog-list');
 			list.innerHTML = '';
-			novelListData.forEach(function(novel) {
-				var div = document.createElement('div');
-				div.className = 'novel-list-item';
-				div.innerHTML = '<span class="title">' + novel.title + '</span><span class="meta">' + novel.author + ' | ' + novel.rating + ' Rating | ' + novel.views + ' Views</span>';
-				div.onclick = function() { displayNovelData(novel.id); };
-				list.appendChild(div);
-			});
+			
+			// 优先显示当前作品的章节目录
+			if (currentChapterMenu && currentChapterMenu.length > 0) {
+				var header = document.createElement('div');
+				header.className = 'section-title';
+				header.textContent = 'Table of Contents (' + currentChapterMenu.length + ' chapters)';
+				list.appendChild(header);
+				
+				currentChapterMenu.forEach(function(chapter, index) {
+					var item = document.createElement('div');
+					item.className = 'novel-list-item';
+					
+					if (String(chapter.ID) === String(currentNovelId)) {
+						item.style.background = 'rgba(249, 153, 102, 0.2)';
+						item.style.borderLeftColor = '#f96';
+					}
+					
+					var titleSpan = document.createElement('span');
+					titleSpan.className = 'title';
+					titleSpan.textContent = (index + 1) + '. ' + (chapter.Title || 'Untitled');
+					
+					var metaSpan = document.createElement('span');
+					metaSpan.className = 'meta';
+					var metaParts = [];
+					if (chapter.IsChapter) metaParts.push('Chapter');
+					if (chapter.WordCount) metaParts.push((chapter.WordCount / 1000).toFixed(1) + 'k words');
+					metaSpan.textContent = metaParts.join(' | ');
+					
+					item.appendChild(titleSpan);
+					item.appendChild(metaSpan);
+					
+					item.onclick = function() {
+						playSound('audio1');
+						displayNovelData(chapter.ID);
+					};
+					
+					list.appendChild(item);
+				});
+			} else if (novelListData.length > 0) {
+				// 显示之前加载的作品列表
+				novelListData.forEach(function(novel) {
+					var item = document.createElement('div');
+					item.className = 'novel-list-item';
+					
+					var titleSpan = document.createElement('span');
+					titleSpan.className = 'title';
+					titleSpan.textContent = novel.title;
+					
+					var metaSpan = document.createElement('span');
+					metaSpan.className = 'meta';
+					metaSpan.textContent = novel.author + ' | Views: ' + novel.views;
+					
+					item.appendChild(titleSpan);
+					item.appendChild(metaSpan);
+					
+					item.onclick = function() {
+						playSound('audio1');
+						displayNovelData(novel.id);
+					};
+					
+					list.appendChild(item);
+				});
+			} else {
+				// 没有数据时显示提示
+				var placeholder = document.createElement('div');
+				placeholder.className = 'search-placeholder';
+				placeholder.textContent = 'No chapter list available. Please select a novel first.';
+				list.appendChild(placeholder);
+			}
 		}
 		
 		/**
