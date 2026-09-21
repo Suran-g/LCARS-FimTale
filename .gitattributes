@@ -1,0 +1,21 @@
+# Normalise line endings on checkout/commit so Windows and other platforms
+# do not produce spurious whole-file diffs.
+* text=auto eol=crlf
+
+# Binary assets must never be converted.
+*.woff   binary
+*.woff2  binary
+*.mp3    binary
+*.png    binary
+*.jpg    binary
+*.gif    binary
+*.ico    binary
+
+# Keep these as-is on every platform.
+*.md     text eol=crlf
+*.html   text eol=crlf
+*.css    text eol=crlf
+*.js     text eol=crlf
+
+# Treat generated/vendored trees as such in diffs and language stats.
+legacy/* linguist-documentation

@@ -1,6 +1,44 @@
 
 ## 项目说明 / About This Project
 
+### 文件结构 / Layout
+
+```
+index.html                  入口，重定向到 classic-standard.html
+classic-standard.html       首页（Classic 主题）
+novel-reader.html           小说阅读器（主应用）
+api-config.html             API 密钥配置
+apikey-login.html           API 密钥配置（旧入口，功能相同，保留兼容旧链接）
+about.html                  项目与许可说明
+classic-ultra.html          ┐
+lower-decks.html            │ Classic / Lower Decks / Lower Decks PADD /
+lower-decks-padd.html       │ Nemesis Blue 主题的官方模板示例页，
+nemesis-blue-standard.html  │ 未做定制，仅随模板更新
+nemesis-blue-ultra.html     ┘
+assets/
+  classic.css               ┐
+  lower-decks.css           │ 四个主题样式表
+  lower-decks-padd.css      │
+  nemesis-blue.css          ┘
+  lcars-ui.js               本站新增：共享界面逻辑（时钟/设备/网络等读数、
+                            提示音与跳转、滚动到顶、署名页脚、文本转义）
+  lcars.js                  模板基础行为（提示音包装、手风琴）
+  lcars-responsive.js       小屏适配（数据瀑布行数、按钮换行）
+  novel-api.js              FimTale API 客户端
+  Antonio-*.woff            LCARS 使用的 Antonio 字体
+  beep1-4.mp3               LCARS 按键音
+legacy/                     早期测试页（test / simple / full-test / test-api），
+                            已从站点根目录移出，不再参与导航
+```
+
+### 架构说明 / Architecture note
+
+时钟、设备、网络、电量、内存、运行时长等界面读数原先在 `about.html`、
+`api-config.html`、`classic-standard.html`、`novel-reader.html` 四个页面里各复制了一份，
+共约 140 行 ×4，且各副本已经出现差异和缺陷。现在统一由 `assets/lcars-ui.js` 提供；
+每个页面通过在数据瀑布容器上声明 `data-lcars-readout="<前缀>"` 指定自己使用哪一组元素
+（例如阅读器用 `dc-time`，关于页用 `about-time`）。新增页面时只需加载该脚本并声明前缀。
+
 ### 1. 项目目的
 本网站是基于 **LCARS Inspired Website Template** 构建的一个非商业演示项目。  
 主要目标是：

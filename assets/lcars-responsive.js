@@ -1,316 +1,240 @@
 /**
- * LCARS 响应式优化工具
- * 检测浏览器类型和设备类型，优化移动端显示效果
+ * lcars-responsive.js — mobile / small-viewport adjustments
+ * =========================================================
+ * Part of the LCARS-FimTale project.
+ *
+ * LCARS Inspired Website Template by www.TheLCARS.com, with modifications.
+ *
+ * WHY THIS IS MOSTLY CSS'S JOB
+ * ----------------------------
+ * The theme stylesheets already carry a full set of `@media` breakpoints. This
+ * file only handles the few cases that need measurement in JS: trimming the data
+ * cascade to fewer rows as space runs out, and letting the navigation buttons
+ * wrap.
+ *
+ * The previous implementation applied `style.display = 'none'` inline to the
+ * `.dc-row-4` / `.dc-row-5` elements, but only ever *restored* them when the
+ * viewport grew past 480px. A window dragged from ≤375px to, say, 420px left
+ * those rows permanently invisible, and a phone rotated to landscape kept the
+ * mobile `max-height` clip with no way to scroll. Visibility is now decided in
+ * exactly one place per row from the current width, and the inline caps are
+ * removed again when they no longer apply.
  */
-
-var LCARSResponsive = (function() {
+(function (window, document) {
 	'use strict';
-	
+
+	var MOBILE_MAX_HEIGHT_RATIO = 0.35;
+
+	/* ------------------------------------------------------------------ *
+	 * Detection
+	 * ------------------------------------------------------------------ */
+
 	/**
-	 * 设备类型检测
+	 * Coarse device class. User-agent sniffing is inherently approximate; the
+	 * stylesheets use media queries and this is only used for the couple of
+	 * JS-driven tweaks below, so a wrong answer is cosmetic.
+	 * @returns {'tablet'|'mobile'|'desktop'}
 	 */
 	function getDeviceType() {
-		var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-		
-		// 平板设备检测
-		if (/iPad/.test(userAgent)) {
-			return 'tablet';
+		var ua = navigator.userAgent || '';
+
+		if (/iPad/.test(ua)) { return 'tablet'; }
+		// iPadOS 13+ masquerades as desktop Safari: a touch-capable "Mac" is an iPad.
+		if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) { return 'tablet'; }
+
+		if (/Android/.test(ua)) {
+			// Android tablets omit "Mobile" from the UA string.
+			return /Mobile/.test(ua) ? 'mobile' : 'tablet';
 		}
-		
-		// 移动设备检测
-		if (/Android/.test(userAgent) && /Mobile/.test(userAgent)) {
-			return 'mobile';
-		}
-		if (/iPhone|iPad|iPod/.test(userAgent)) {
-			return 'mobile';
-		}
-		if (/Windows Phone/.test(userAgent)) {
-			return 'mobile';
-		}
-		
-		// 桌面设备
+		if (/iPhone|iPod/.test(ua)) { return 'mobile'; }
+		if (/Windows Phone/.test(ua)) { return 'mobile'; }
+
 		return 'desktop';
 	}
-	
+
 	/**
-	 * 浏览器类型检测
+	 * @returns {string}
 	 */
 	function getBrowserType() {
-		var userAgent = navigator.userAgent;
-		
-		if (/Chrome/.test(userAgent) && !/Edg/.test(userAgent)) {
-			return 'chrome';
-		}
-		if (/Firefox/.test(userAgent)) {
-			return 'firefox';
-		}
-		if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) {
-			return 'safari';
-		}
-		if (/Edg/.test(userAgent)) {
-			return 'edge';
-		}
-		if (/MSIE|Trident/.test(userAgent)) {
-			return 'ie';
-		}
-		
+		var ua = navigator.userAgent || '';
+		// Order matters: Edge and Opera both also match "Chrome".
+		if (/Edg\//.test(ua)) { return 'edge'; }
+		if (/OPR\//.test(ua) || /Opera/.test(ua)) { return 'opera'; }
+		if (/Firefox\//.test(ua)) { return 'firefox'; }
+		if (/Chrome\//.test(ua)) { return 'chrome'; }
+		if (/Safari\//.test(ua)) { return 'safari'; }
 		return 'unknown';
 	}
-	
+
 	/**
-	 * 获取屏幕方向
+	 * @returns {'portrait'|'landscape'}
 	 */
 	function getScreenOrientation() {
-		if (window.innerWidth > window.innerHeight) {
-			return 'landscape';
-		}
-		return 'portrait';
+		return window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
 	}
-	
+
+	/* ------------------------------------------------------------------ *
+	 * Data cascade
+	 * ------------------------------------------------------------------ */
+
 	/**
-	 * 根据设备类型计算最佳缩放比例
+	 * Which rows may be shown at a given width. Returning the decision from one
+	 * function is what keeps `display` from getting stuck: every row is either
+	 * explicitly shown or explicitly hidden on every pass.
+	 * @param {number} width
+	 * @returns {{row4: boolean, row5: boolean, cap: (number|null)}}
 	 */
-	function getOptimalScale() {
-		var deviceType = getDeviceType();
-		var screenWidth = window.innerWidth;
-		
-		if (deviceType === 'desktop') {
-			return 1;
-		}
-		
-		if (deviceType === 'tablet') {
-			// 平板：根据屏幕宽度调整
-			if (screenWidth >= 1024) {
-				return 0.9;
-			}
-			return 0.8;
-		}
-		
-		// 移动设备：根据屏幕宽度精细调整
-		if (screenWidth >= 768) {
-			return 0.85;
-		}
-		if (screenWidth >= 600) {
-			return 0.75;
-		}
-		if (screenWidth >= 480) {
-			return 0.65;
-		}
-		if (screenWidth >= 375) {
-			return 0.6;
-		}
-		
-		// 小屏幕手机
-		return 0.55;
+	function planForWidth(width) {
+		// Below 375px the cascade keeps only the first three rows of each column.
+		if (width <= 375) { return { row4: false, row5: false, cap: 0.30 }; }
+		if (width <= 480) { return { row4: true, row5: false, cap: 0.35 }; }
+		return { row4: true, row5: true, cap: null };
 	}
-	
+
 	/**
-	 * 应用data-cascade优化（仅调整字体和显示/隐藏行，不使用transform缩放）
+	 * Apply the plan to the cascade wrapper, if this page has one.
 	 */
 	function applyDataCascadeScale() {
 		var wrapper = document.querySelector('.data-cascade-wrapper');
-		if (!wrapper) return;
-		
-		var deviceType = getDeviceType();
-		var screenWidth = window.innerWidth;
-		
-		// 移动端：限制最大高度避免溢出
-		if (deviceType === 'mobile' || deviceType === 'tablet') {
-			var maxHeight = Math.floor(window.innerHeight * 0.35);
-			wrapper.style.maxHeight = maxHeight + 'px';
+		if (!wrapper) { return; }
+
+		var plan = planForWidth(window.innerWidth);
+
+		['dc-row-4', 'dc-row-5'].forEach(function (cls) {
+			var wanted = cls === 'dc-row-4' ? plan.row4 : plan.row5;
+			var rows = wrapper.querySelectorAll('.' + cls);
+			Array.prototype.forEach.call(rows, function (row) {
+				row.style.display = wanted ? '' : 'none';
+			});
+		});
+
+		var compact = plan.cap !== null;
+		if (compact) {
+			wrapper.style.maxHeight = Math.floor(window.innerHeight * plan.cap) + 'px';
 			wrapper.style.overflow = 'hidden';
-			
-			// 根据屏幕宽度调整字体大小
-			var fontSize = '0.7rem';
-			if (screenWidth < 375) {
-				fontSize = '0.55rem';
-			} else if (screenWidth < 480) {
-				fontSize = '0.6rem';
-			} else if (screenWidth < 600) {
-				fontSize = '0.65rem';
+		} else {
+			// Clear the inline caps so the stylesheet's own height applies again.
+			wrapper.style.maxHeight = '';
+			wrapper.style.overflow = '';
+		}
+
+		// Tighten the type only while the cascade is being capped.
+		var fontScale = null;
+		if (window.innerWidth < 375) { fontScale = '0.55rem'; }
+		else if (window.innerWidth < 480) { fontScale = '0.6rem'; }
+		else if (window.innerWidth < 600) { fontScale = '0.65rem'; }
+
+		var cells = wrapper.querySelectorAll('.data-column div');
+		Array.prototype.forEach.call(cells, function (cell) {
+			if (fontScale) {
+				cell.style.fontSize = fontScale;
+				cell.style.padding = '0.15rem 0.3rem';
+			} else {
+				cell.style.fontSize = '';
+				cell.style.padding = '';
 			}
-			
-			var rows = wrapper.querySelectorAll('.data-column div');
-			rows.forEach(function(el) {
-				el.style.fontSize = fontSize;
-				el.style.padding = '0.15rem 0.3rem';
-			});
-		}
-		
-		// 小屏幕：隐藏次要数据行
-		if (screenWidth <= 480) {
-			var row5Elements = wrapper.querySelectorAll('.dc-row-5');
-			row5Elements.forEach(function(el) {
-				el.style.display = 'none';
-			});
-		}
-		
-		// 极小屏幕：隐藏第4行
-		if (screenWidth <= 375) {
-			var row4Elements = wrapper.querySelectorAll('.dc-row-4');
-			row4Elements.forEach(function(el) {
-				el.style.display = 'none';
-			});
-		}
-		
-		// 大屏幕：恢复所有行的显示
-		if (screenWidth > 480) {
-			var allRows = wrapper.querySelectorAll('.dc-row-4, .dc-row-5');
-			allRows.forEach(function(el) {
-				el.style.display = '';
-			});
-		}
+		});
 	}
-	
+
+	/* ------------------------------------------------------------------ *
+	 * Navigation buttons
+	 * ------------------------------------------------------------------ */
+
 	/**
-	 * 优化导航按钮布局
+	 * Let the cascade's button row wrap on narrow screens instead of overflowing.
 	 */
 	function optimizeNavButtons() {
-		var deviceType = getDeviceType();
-		var navGroup = document.querySelector('.data-cascade-button-group nav');
-		
-		if (!navGroup) return;
-		
-		if (deviceType === 'mobile') {
-			// 移动端：按钮换行显示
-			navGroup.style.display = 'flex';
-			navGroup.style.flexWrap = 'wrap';
-			navGroup.style.gap = '0.3rem';
-			
-			var buttons = navGroup.querySelectorAll('button');
-			buttons.forEach(function(btn) {
+		var nav = document.querySelector('.data-cascade-button-group nav');
+		if (!nav) { return; }
+
+		var device = getDeviceType();
+		var narrow = window.innerWidth <= 750 || device !== 'desktop';
+
+		if (narrow) {
+			nav.style.display = 'flex';
+			nav.style.flexWrap = 'wrap';
+			nav.style.gap = device === 'mobile' ? '0.3rem' : '0.5rem';
+			var minWidth = device === 'mobile' ? '3.5rem' : '4rem';
+			Array.prototype.forEach.call(nav.querySelectorAll('button'), function (btn) {
 				btn.style.flex = '1 1 auto';
-				btn.style.minWidth = '3.5rem';
-				btn.style.fontSize = '0.8rem';
-				btn.style.padding = '0.5rem 0.75rem';
+				btn.style.minWidth = minWidth;
 			});
-		} else if (deviceType === 'tablet') {
-			// 平板：适当调整
-			navGroup.style.display = 'flex';
-			navGroup.style.flexWrap = 'wrap';
-			navGroup.style.gap = '0.5rem';
-			
-			var buttons = navGroup.querySelectorAll('button');
-			buttons.forEach(function(btn) {
-				btn.style.flex = '1 1 auto';
-				btn.style.minWidth = '4rem';
+		} else {
+			// Hand the layout back to the stylesheet.
+			nav.style.display = '';
+			nav.style.flexWrap = '';
+			nav.style.gap = '';
+			Array.prototype.forEach.call(nav.querySelectorAll('button'), function (btn) {
+				btn.style.flex = '';
+				btn.style.minWidth = '';
 			});
 		}
 	}
-	
-	/**
-	 * 优化侧边面板
-	 */
-	function optimizeSidePanels() {
-		var deviceType = getDeviceType();
-		var leftFrame = document.querySelector('.left-frame');
-		
-		if (!leftFrame) return;
-		
-		if (deviceType === 'mobile') {
-			// 移动端：调整面板字体和间距
-			var panels = leftFrame.querySelectorAll('[class^="panel-"]');
-			panels.forEach(function(panel) {
-				panel.style.fontSize = '0.8rem';
-				panel.style.padding = '0.5rem';
-			});
-		}
-	}
-	
-	/**
-	 * 优化主内容区域
-	 */
-	function optimizeMainContent() {
-		var deviceType = getDeviceType();
-		var mainContent = document.querySelector('.reader-content, main');
-		
-		if (!mainContent) return;
-		
-		if (deviceType === 'mobile') {
-			// 移动端：增加内边距
-			mainContent.style.padding = '1rem 0.5rem';
-		}
-	}
-	
-	/**
-	 * 添加设备类型class到body
-	 */
+
+	/* ------------------------------------------------------------------ *
+	 * Body classes
+	 * ------------------------------------------------------------------ */
+
 	function addDeviceClass() {
-		var deviceType = getDeviceType();
-		document.body.classList.add('device-' + deviceType);
-		
-		var orientation = getScreenOrientation();
-		document.body.classList.add('orientation-' + orientation);
+		var body = document.body;
+		if (!body) { return; }
+		body.classList.remove('device-mobile', 'device-tablet', 'device-desktop');
+		body.classList.add('device-' + getDeviceType());
+
+		body.classList.remove('orientation-portrait', 'orientation-landscape');
+		body.classList.add('orientation-' + getScreenOrientation());
 	}
-	
-	/**
-	 * 监听窗口大小变化
-	 */
-	function setupResizeListener() {
-		var resizeTimer;
-		
-		window.addEventListener('resize', function() {
-			// 防抖：延迟执行优化
-			clearTimeout(resizeTimer);
-			resizeTimer = setTimeout(function() {
-				applyDataCascadeScale();
-				optimizeNavButtons();
-				
-				// 更新方向class
-				document.body.classList.remove('orientation-portrait', 'orientation-landscape');
-				document.body.classList.add('orientation-' + getScreenOrientation());
-			}, 250);
-		});
-		
-		// 监听屏幕方向变化
-		window.addEventListener('orientationchange', function() {
-			setTimeout(function() {
-				applyDataCascadeScale();
-				optimizeNavButtons();
-				
-				document.body.classList.remove('orientation-portrait', 'orientation-landscape');
-				document.body.classList.add('orientation-' + getScreenOrientation());
-			}, 300);
-		});
-	}
-	
-	/**
-	 * 初始化所有优化
-	 */
-	function init() {
+
+	/* ------------------------------------------------------------------ *
+	 * Lifecycle
+	 * ------------------------------------------------------------------ */
+
+	var resizeTimer = null;
+	var initialised = false;
+
+	function runOptimisations() {
 		addDeviceClass();
 		applyDataCascadeScale();
 		optimizeNavButtons();
-		optimizeSidePanels();
-		optimizeMainContent();
-		setupResizeListener();
-		
-		// 在控制台输出设备信息（调试用）
-		console.log('[LCARS Responsive] Device:', getDeviceType());
-		console.log('[LCARS Responsive] Browser:', getBrowserType());
-		console.log('[LCARS Responsive] Screen:', window.innerWidth + 'x' + window.innerHeight);
-		console.log('[LCARS Responsive] Orientation:', getScreenOrientation());
 	}
-	
-	/**
-	 * 公开接口
-	 */
-	return {
+
+	function onViewportChange() {
+		if (resizeTimer) { window.clearTimeout(resizeTimer); }
+		resizeTimer = window.setTimeout(function () {
+			resizeTimer = null;
+			runOptimisations();
+		}, 150);
+	}
+
+	function init() {
+		if (initialised) { return; }
+		initialised = true;
+
+		runOptimisations();
+
+		// `resize` fires for orientation changes too, and `orientationchange` is
+		// deprecated, so a single debounced resize handler covers both.
+		window.addEventListener('resize', onViewportChange, { passive: true });
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init, { once: true });
+	} else {
+		init();
+	}
+
+	/* ------------------------------------------------------------------ *
+	 * Exports
+	 * ------------------------------------------------------------------ */
+
+	window.LCARSResponsive = {
 		init: init,
+		refresh: runOptimisations,
 		getDeviceType: getDeviceType,
 		getBrowserType: getBrowserType,
 		getScreenOrientation: getScreenOrientation,
-		getOptimalScale: getOptimalScale,
 		applyDataCascadeScale: applyDataCascadeScale,
 		optimizeNavButtons: optimizeNavButtons
 	};
-})();
 
-// DOM加载完成后自动初始化
-if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', function() {
-		LCARSResponsive.init();
-	});
-} else {
-	LCARSResponsive.init();
-}
+})(window, document);

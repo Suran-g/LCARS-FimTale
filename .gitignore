@@ -1,0 +1,79 @@
+# ============================================================================
+# LCARS-FimTale — files that must never be committed
+# ============================================================================
+# The site is plain static HTML/CSS/JS, so nothing here is generated. This list
+# exists to keep secrets and scratch files out of the published repository.
+#
+# IMPORTANT: FimTale API credentials must never be committed. The official API
+# documentation says so explicitly:
+#   "切勿在公开仓库、前端代码或日志中明文保存 APIPass"
+# The app stores them in the browser's localStorage at runtime, which is not part
+# of the repository — this file guards against someone pasting them into a file.
+# ============================================================================
+
+# --- credentials and local configuration ------------------------------------
+.env
+.env.*
+*.env
+credentials.json
+secrets.json
+config.local.js
+config.local.json
+
+# A local endpoint override for development (never commit a personal one).
+api-config.local.html
+
+# --- local scratch / debug files --------------------------------------------
+# Diagnostic scripts, captured API responses, drafts.
+*.log
+*.tmp
+*.bak
+*.orig
+*.rej
+*.swp
+*~
+_scratch/
+scratch/
+debug/
+probe/
+_audit/
+# A one-off diagnostic page or script dropped in the repository root.
+debug.html
+debug*.js
+
+# Captured responses may contain private data (novels, comments, user info).
+response.json
+*.response.json
+*.dumped.json
+*.har
+
+# --- editor / IDE ------------------------------------------------------------
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# --- operating system --------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# --- node / tooling (not used to build this site, but keep the tree clean) ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# --- caches ------------------------------------------------------------------
+.cache/
+.parcel-cache/
+.temp/
+tmp/

@@ -22,6 +22,19 @@
 			margin: 2rem auto;
 			padding: 2rem;
 		}
+
+		/* The markup has always used class="reader-content" here, but that rule
+		   only exists on novel-reader.html — so on this page the content sat flush
+		   against the frame. Defined locally so both pages agree. */
+		.reader-content {
+			padding: 1.5rem;
+		}
+
+		@media (max-width: 750px) {
+			.reader-content {
+				padding: 1rem 0.5rem;
+			}
+		}
 		
 		.about-title {
 			color: #f96;
@@ -168,8 +181,21 @@
 	<div class="wrap-everything">
 		<section id="column-1">
 			<div class="lcars-frame">
-				<div class="bar-frame-top"></div>
-				<div class="bar-frame"></div>
+				<div class="frame-col-1">
+					<div class="frame-col-1-cell-a"></div>
+					<div class="frame-col-1-cell-b"></div>
+					<div class="frame-col-1-cell-c"></div>
+				</div>
+				<div class="frame-col-2"> </div>
+				<div class="frame-col-3 display-vertical">
+					<div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+				</div>
+				<div class="frame-col-4"> </div>
+				<div class="frame-col-5">
+					<div class="frame-col-5-cell-a"></div>
+					<div class="frame-col-5-cell-b"></div>
+					<div class="frame-col-5-cell-c"></div>
+				</div>
 			</div>
 		</section>
 		
@@ -184,7 +210,7 @@
 				<div class="right-frame-top">
 					<div class="banner">LCARS &#149; ABOUT</div>
 					<div class="data-cascade-button-group">
-						<div class="data-cascade-wrapper" id="about-data">
+						<div class="data-cascade-wrapper" id="about-data" data-lcars-readout="about">
 							<div class="data-column">
 								<div class="dc-row-1">SYS</div>
 								<div class="dc-row-1">MODE</div>
@@ -243,9 +269,9 @@
 						<div class="panel-7">05<span class="hop">-ABOUT</span></div>
 					</div>
 					<div>
-						<div class="panel-8">06<span class="hop">-CONFIG</span></div>
-						<div class="panel-9">07<span class="hop">-EXIT</span></div>
-						<div class="panel-10">08<span class="hop">-STATUS</span></div>
+						<div class="panel-8" onclick="playSoundAndRedirect('audio2', 'api-config.html')">06<span class="hop">-CONFIG</span></div>
+						<div class="panel-9" onclick="playSoundAndRedirect('audio2', 'classic-standard.html')">07<span class="hop">-EXIT</span></div>
+						<div class="panel-10" onclick="playSoundAndRedirect('audio2', 'novel-reader.html')">08<span class="hop">-STATUS</span></div>
 					</div>
 				</div>
 				
@@ -363,149 +389,8 @@
 	</div>
 	
 	<script type="text/javascript" src="assets/lcars.js"></script>
+	<script type="text/javascript" src="assets/lcars-ui.js"></script>
 	<script type="text/javascript" src="assets/lcars-responsive.js"></script>
-	<script type="text/javascript">
-		/**
-		 * 初始化动态数据更新
-		 */
-		function initDynamicData() {
-			updateTime();
-			updateDeviceInfo();
-			updateNetworkInfo();
-			updateScreenInfo();
-			updateBatteryInfo();
-			updateMemoryInfo();
-			updateUptime();
-			updateLanguage();
-			updateUserAgent();
-			
-			setInterval(updateTime, 1000);
-			setInterval(updateNetworkInfo, 10000);
-			setInterval(updateBatteryInfo, 30000);
-			setInterval(updateMemoryInfo, 30000);
-			setInterval(updateUptime, 1000);
-			setInterval(updateScreenInfo, 5000);
-			
-			window.addEventListener('resize', updateScreenInfo);
-			window.addEventListener('online', updateNetworkInfo);
-			window.addEventListener('offline', updateNetworkInfo);
-		}
-		
-		function updateTime() {
-			var now = new Date();
-			var h = String(now.getHours()).padStart(2, '0');
-			var m = String(now.getMinutes()).padStart(2, '0');
-			var s = String(now.getSeconds()).padStart(2, '0');
-			document.getElementById('about-time').textContent = h + ':' + m + ':' + s;
-			
-			var y = now.getFullYear();
-			var mo = String(now.getMonth() + 1).padStart(2, '0');
-			var d = String(now.getDate()).padStart(2, '0');
-			document.getElementById('about-date').textContent = y + '/' + mo + '/' + d;
-		}
-		
-		function updateDeviceInfo() {
-			var dev = document.getElementById('about-dev');
-			var ua = navigator.userAgent;
-			if (/iPad/.test(ua)) dev.textContent = 'iPad';
-			else if (/iPhone/.test(ua)) dev.textContent = 'iPhone';
-			else if (/Android/.test(ua)) dev.textContent = 'Android';
-			else if (/Windows/.test(ua)) dev.textContent = 'WinPC';
-			else if (/Macintosh/.test(ua)) dev.textContent = 'Mac';
-			else if (/Linux/.test(ua)) dev.textContent = 'Linux';
-			else dev.textContent = 'N/A';
-		}
-		
-		function updateNetworkInfo() {
-			var net = document.getElementById('about-net');
-			var sys = document.getElementById('about-sys');
-			
-			if (navigator.onLine) {
-				sys.textContent = 'ONLINE';
-				sys.style.color = '#6c6';
-				if (navigator.connection) {
-					var conn = navigator.connection;
-					var type = conn.effectiveType || 'unknown';
-					var downlink = conn.downlink ? conn.downlink.toFixed(1) : '?';
-					net.textContent = type.toUpperCase() + ' ' + downlink + 'Mb';
-				} else {
-					net.textContent = 'ONLINE';
-				}
-			} else {
-				sys.textContent = 'OFFLINE';
-				sys.style.color = '#c66';
-				net.textContent = 'OFFLINE';
-			}
-		}
-		
-		function updateScreenInfo() {
-			var scr = document.getElementById('about-scr');
-			var w = window.innerWidth;
-			var h = window.innerHeight;
-			var dpr = window.devicePixelRatio || 1;
-			scr.textContent = w + 'x' + h + ' ' + dpr.toFixed(1) + 'x';
-		}
-		
-		function updateBatteryInfo() {
-			var batt = document.getElementById('about-batt');
-			if ('getBattery' in navigator) {
-				navigator.getBattery().then(function(battery) {
-					var level = Math.round(battery.level * 100);
-					var charging = battery.charging ? '⚡' : '';
-					batt.textContent = level + '%' + charging;
-					if (level <= 20) batt.style.color = '#c66';
-					else if (level <= 50) batt.style.color = '#f96';
-					else batt.style.color = '';
-				}).catch(function() {
-					batt.textContent = 'N/A';
-				});
-			} else {
-				batt.textContent = 'N/A';
-			}
-		}
-		
-		function updateMemoryInfo() {
-			var mem = document.getElementById('about-mem');
-			if (performance.memory) {
-				var usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
-				var totalMB = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
-				mem.textContent = usedMB + 'MB/' + totalMB + 'MB';
-			} else {
-				mem.textContent = 'N/A';
-			}
-		}
-		
-		var pageLoadTime = Date.now();
-		function updateUptime() {
-			var uptime = document.getElementById('about-uptime');
-			var elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
-			var hours = Math.floor(elapsed / 3600);
-			var minutes = Math.floor((elapsed % 3600) / 60);
-			var seconds = elapsed % 60;
-			uptime.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-		}
-		
-		function updateLanguage() {
-			var lang = document.getElementById('about-lang');
-			lang.textContent = navigator.language || 'N/A';
-		}
-		
-		function updateUserAgent() {
-			var ua = document.getElementById('about-ua');
-			var browser = 'N/A';
-			var userAgent = navigator.userAgent;
-			if (/Chrome/.test(userAgent) && !/Edg/.test(userAgent)) browser = 'Chrome';
-			else if (/Firefox/.test(userAgent)) browser = 'Firefox';
-			else if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) browser = 'Safari';
-			else if (/Edg/.test(userAgent)) browser = 'Edge';
-			ua.textContent = browser;
-		}
-		
-		document.addEventListener('DOMContentLoaded', function() {
-			initDynamicData();
-		});
-	</script>
-	
 	<div class="headtrim"> </div>
 	<div class="baseboard"> </div>
 </body>

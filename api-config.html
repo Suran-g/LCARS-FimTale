@@ -26,6 +26,7 @@
 		.cancel-btn { background: #c44; color: black; }
 		.test-btn { background: #89f; color: black; }
 		.status-panel { margin-top: 2rem; padding: 1rem; background: rgba(201,153,255,0.1); border-left: 4px solid #c9f; }
+		.field-hint { color: #99a; font-size: 0.85rem; margin: 0.4rem 0 0; }
 		
 		@media (max-width: 750px) {
 			.data-cascade-wrapper {
@@ -122,7 +123,7 @@
 				<div class="right-frame-top">
 				<div class="banner">LCARS &#149; API CONFIG</div>
 				<div class="data-cascade-button-group">
-					<div class="data-cascade-wrapper" id="api-config-data">
+					<div class="data-cascade-wrapper" id="api-config-data" data-lcars-readout="api">
 						<div class="data-column">
 							<div class="dc-row-1">SYS</div>
 							<div class="dc-row-1">MODE</div>
@@ -196,16 +197,21 @@
 						
 						<div class="form-container">
 							<div class="form-group">
-								<label>API Key</label>
-								<input type="text" id="apiKey" placeholder="请输入API Key">
+								<label for="apiKey">API Key</label>
+								<input type="text" id="apiKey" name="apiKey" autocomplete="off" spellcheck="false"
+									maxlength="8" placeholder="8 位十六进制，例如 a1b2c3d4">
+								<p class="field-hint" id="apiKeyHint">FimTale 设置页生成的 8 位十六进制字符串。</p>
 							</div>
 							<div class="form-group">
-								<label>API Pass</label>
-								<input type="password" id="apiPass" placeholder="请输入API Pass">
+								<label for="apiPass">API Pass</label>
+								<input type="password" id="apiPass" name="apiPass" autocomplete="current-password"
+									maxlength="12" placeholder="12 位十六进制">
+								<p class="field-hint" id="apiPassHint">与 APIKey 配对的 12 位十六进制字符串。</p>
 							</div>
 							<div class="form-group">
-								<label>API Endpoint</label>
-								<input type="text" id="apiEndpoint" value="https://fimtale.com/api/v1" readonly>
+								<label for="apiEndpoint">API Endpoint</label>
+								<input type="text" id="apiEndpoint" name="apiEndpoint" value="https://fimtale.com/api/v1">
+								<p class="field-hint">留空则按当前访问来源自动选择（本地开发用 /api，静态站点直连 fimtale.com）。</p>
 							</div>
 							<button class="submit-btn" onclick="saveAPIKey()">保存配置</button>
 							<button class="cancel-btn" onclick="window.location.href='classic-standard.html'">取消</button>
@@ -219,222 +225,194 @@
 							<p><strong>连接:</strong> <span id="connectionStatus">未测试</span></p>
 						</div>
 					</main>
+
+					<footer data-lcars-footer></footer>
 				</div>
 			</div>
 		</section>
 	</div>
 	
 	<script type="text/javascript" src="assets/lcars.js"></script>
+	<script type="text/javascript" src="assets/lcars-ui.js"></script>
 	<script type="text/javascript" src="assets/lcars-responsive.js"></script>
-	<script type="text/javascript" src="assets/novel-api.js?v=20260418"></script>
+	<script type="text/javascript" src="assets/novel-api.js"></script>
 	<script>
-		function saveAPIKey() {
-			var apiKey = document.getElementById('apiKey').value.trim();
-			var apiPass = document.getElementById('apiPass').value.trim();
-			
-			if (!apiKey) { alert('请输入API Key'); return; }
-			if (!apiPass) { alert('请输入API Pass'); return; }
-			
-			NovelAPI.saveCredentials(apiKey, apiPass);
-			
-			document.getElementById('currentKey').textContent = '已配置';
-			document.getElementById('currentPass').textContent = '已配置';
-			alert('API配置保存成功!');
-		}
-		
-		function clearAPIKey() {
-			NovelAPI.clearCredentials();
-			
-			document.getElementById('apiKey').value = '';
-			document.getElementById('apiPass').value = '';
-			document.getElementById('currentKey').textContent = '未配置';
-			document.getElementById('currentPass').textContent = '未配置';
-			document.getElementById('connectionStatus').textContent = '未测试';
-			alert('API配置已清除');
-		}
-		
-		async function testAPIConnection() {
-			var statusElement = document.getElementById('connectionStatus');
-			statusElement.textContent = '测试中...';
-			
-			var apiKey = document.getElementById('apiKey').value.trim();
-			var apiPass = document.getElementById('apiPass').value.trim();
-			
-			if (apiKey && apiPass) {
-				NovelAPI.saveCredentials(apiKey, apiPass);
+		/**
+		 * Load the stored credentials into the form.
+		 */
+		function loadStoredCredentials() {
+			var creds = NovelAPI.getStoredCredentials();
+
+			var keyInput = document.getElementById('apiKey');
+			var passInput = document.getElementById('apiPass');
+			var endpointInput = document.getElementById('apiEndpoint');
+
+			if (creds.apiKey && keyInput) {
+				keyInput.value = creds.apiKey;
+				document.getElementById('currentKey').textContent = '已配置';
 			}
-			
-			if (!NovelAPI.hasCredentials()) {
-				statusElement.textContent = '未配置';
-				alert('请先配置API Key和API Pass');
+			if (creds.apiPass && passInput) {
+				passInput.value = creds.apiPass;
+				document.getElementById('currentPass').textContent = '已配置';
+			}
+			if (endpointInput) {
+				endpointInput.value = NovelAPI.getAPIEndpoint();
+			}
+		}
+
+		function setStatus(message, color) {
+			var el = document.getElementById('connectionStatus');
+			if (!el) { return; }
+			el.textContent = message;
+			el.style.color = color || '';
+		}
+
+		function setFieldHint(id, message, isError) {
+			var el = document.getElementById(id);
+			if (!el) { return; }
+			el.textContent = message || '';
+			el.style.color = isError ? '#c66' : '#99a';
+		}
+
+		/**
+		 * Live feedback against the documented credential shapes:
+		 * APIKey is 8 lowercase hex chars, APIPass is 12.
+		 * Catching a typo here is far cheaper than a 403 round-trip.
+		 */
+		function validateForm() {
+			var keyInput = document.getElementById('apiKey');
+			var passInput = document.getElementById('apiPass');
+			if (!keyInput || !passInput) { return { ok: false, problems: [] }; }
+
+			var result = NovelAPI.validateCredentials(keyInput.value, passInput.value);
+
+			var keyOk = NovelAPI.API_KEY_PATTERN.test(keyInput.value.trim().toLowerCase());
+			var passOk = NovelAPI.API_PASS_PATTERN.test(passInput.value.trim().toLowerCase());
+
+			if (keyInput.value.trim() && !keyOk) {
+				setFieldHint('apiKeyHint', '格式应为 8 位小写十六进制（0-9a-f），当前 ' +
+					keyInput.value.trim().length + ' 位。', true);
+			} else {
+				setFieldHint('apiKeyHint', 'FimTale 设置页生成的 8 位十六进制字符串。', false);
+			}
+
+			if (passInput.value.trim() && !passOk) {
+				setFieldHint('apiPassHint', '格式应为 12 位小写十六进制（0-9a-f），当前 ' +
+					passInput.value.trim().length + ' 位。', true);
+			} else {
+				setFieldHint('apiPassHint', '与 APIKey 配对的 12 位十六进制字符串。', false);
+			}
+
+			return result;
+		}
+
+		function saveAPIKey() {
+			var keyInput = document.getElementById('apiKey');
+			var passInput = document.getElementById('apiPass');
+			var endpointInput = document.getElementById('apiEndpoint');
+
+			var apiKey = keyInput ? keyInput.value.trim() : '';
+			var apiPass = passInput ? passInput.value.trim() : '';
+			var endpoint = endpointInput ? endpointInput.value.trim() : '';
+
+			if (!apiKey) { alert('请输入 API Key'); if (keyInput) { keyInput.focus(); } return; }
+			if (!apiPass) { alert('请输入 API Pass'); if (passInput) { passInput.focus(); } return; }
+
+			// The API rejects malformed keys with a bare 403, so validate first and
+			// say exactly what is wrong.
+			var shape = NovelAPI.validateCredentials(apiKey, apiPass);
+			if (!shape.ok) {
+				validateForm();
+				alert('凭据格式不正确：\n\n' + shape.problems.join('\n') +
+					'\n\n请到 FimTale 设置页复制完整的 APIKey 与 APIPass。');
 				return;
 			}
-			
-			try {
-				var result = await NovelAPI.testConnection();
-				
-				if (result.success) {
-					statusElement.textContent = '已连接';
-					alert('API连接测试成功!\n\n测试URL: ' + NovelAPI.API_ENDPOINT + '/t/76448\n\n服务器响应: ' + JSON.stringify(result.data).substring(0, 500) + '...');
-				} else {
-					statusElement.textContent = '连接失败';
-					alert('API连接测试失败: ' + result.error);
-				}
-			} catch (error) {
-				statusElement.textContent = '连接失败';
-				alert('API连接测试失败: ' + error.message);
+
+			if (!NovelAPI.saveCredentials(apiKey, apiPass, endpoint)) {
+				// localStorage throws in some privacy modes / sandboxed frames.
+				alert('无法保存：浏览器拒绝了本地存储。请检查是否处于隐私模式或禁用了 Cookie。');
+				return;
 			}
+
+			document.getElementById('currentKey').textContent = '已配置';
+			document.getElementById('currentPass').textContent = '已配置';
+			alert('API 配置保存成功');
 		}
-		
+
+		function clearAPIKey() {
+			NovelAPI.clearCredentials();
+
+			var keyInput = document.getElementById('apiKey');
+			var passInput = document.getElementById('apiPass');
+			if (keyInput) { keyInput.value = ''; }
+			if (passInput) { passInput.value = ''; }
+
+			document.getElementById('currentKey').textContent = '未配置';
+			document.getElementById('currentPass').textContent = '未配置';
+			setStatus('未测试');
+			validateForm();
+			alert('API 配置已清除');
+		}
+
 		/**
-		 * 初始化动态数据更新
+		 * Test the connection and report the outcome.
+		 *
+		 * The credential values are never echoed back: a full request URL contains
+		 * the API pass, and this function used to print it into an alert() and the
+		 * browser console.
 		 */
-		function initDynamicData() {
-			updateTime();
-			updateDeviceInfo();
-			updateNetworkInfo();
-			updateScreenInfo();
-			updateBatteryInfo();
-			updateMemoryInfo();
-			updateUptime();
-			updateLanguage();
-			updateUserAgent();
-			
-			setInterval(updateTime, 1000);
-			setInterval(updateNetworkInfo, 10000);
-			setInterval(updateBatteryInfo, 30000);
-			setInterval(updateMemoryInfo, 30000);
-			setInterval(updateUptime, 1000);
-			setInterval(updateScreenInfo, 5000);
-			
-			window.addEventListener('resize', updateScreenInfo);
-			window.addEventListener('online', updateNetworkInfo);
-			window.addEventListener('offline', updateNetworkInfo);
-		}
-		
-		function updateTime() {
-			var now = new Date();
-			var h = String(now.getHours()).padStart(2, '0');
-			var m = String(now.getMinutes()).padStart(2, '0');
-			var s = String(now.getSeconds()).padStart(2, '0');
-			document.getElementById('api-time').textContent = h + ':' + m + ':' + s;
-			
-			var y = now.getFullYear();
-			var mo = String(now.getMonth() + 1).padStart(2, '0');
-			var d = String(now.getDate()).padStart(2, '0');
-			document.getElementById('api-date').textContent = y + '/' + mo + '/' + d;
-		}
-		
-		function updateDeviceInfo() {
-			var dev = document.getElementById('api-dev');
-			var ua = navigator.userAgent;
-			if (/iPad/.test(ua)) dev.textContent = 'iPad';
-			else if (/iPhone/.test(ua)) dev.textContent = 'iPhone';
-			else if (/Android/.test(ua)) dev.textContent = 'Android';
-			else if (/Windows/.test(ua)) dev.textContent = 'WinPC';
-			else if (/Macintosh/.test(ua)) dev.textContent = 'Mac';
-			else if (/Linux/.test(ua)) dev.textContent = 'Linux';
-			else dev.textContent = 'N/A';
-		}
-		
-		function updateNetworkInfo() {
-			var net = document.getElementById('api-net');
-			var sys = document.getElementById('api-sys');
-			
-			if (navigator.onLine) {
-				sys.textContent = 'ONLINE';
-				sys.style.color = '#6c6';
-				if (navigator.connection) {
-					var conn = navigator.connection;
-					var type = conn.effectiveType || 'unknown';
-					var downlink = conn.downlink ? conn.downlink.toFixed(1) : '?';
-					net.textContent = type.toUpperCase() + ' ' + downlink + 'Mb';
-				} else {
-					net.textContent = 'ONLINE';
-				}
+		async function testAPIConnection() {
+			var keyInput = document.getElementById('apiKey');
+			var passInput = document.getElementById('apiPass');
+			var endpointInput = document.getElementById('apiEndpoint');
+
+			var apiKey = keyInput ? keyInput.value.trim() : '';
+			var apiPass = passInput ? passInput.value.trim() : '';
+
+			if (apiKey && apiPass) {
+				NovelAPI.saveCredentials(apiKey, apiPass,
+					endpointInput ? endpointInput.value.trim() : '');
+			}
+
+			if (!NovelAPI.hasCredentials()) {
+				setStatus('未配置', '#c66');
+				alert('请先配置 API Key 和 API Pass');
+				return;
+			}
+
+			setStatus('测试中…', '#f96');
+
+			var result = await NovelAPI.testConnection();
+
+			if (result.success) {
+				setStatus('已连接', '#6c6');
+				var s = result.summary || {};
+				var lines = [
+					'API 连接测试成功',
+					'',
+					'端点: ' + NovelAPI.getAPIEndpoint(),
+					'探测作品 ID: ' + result.probeId,
+					'返回作品: ' + (s.title ? '《' + s.title + '》' : '(无标题)'),
+					'作者: ' + (s.author || '(未知)'),
+					'目录条目: ' + (typeof s.menuLength === 'number' ? s.menuLength : '—'),
+					'API 身份: ' + (s.user || '(guest)')
+				];
+				alert(lines.join('\n'));
 			} else {
-				sys.textContent = 'OFFLINE';
-				sys.style.color = '#c66';
-				net.textContent = 'OFFLINE';
+				setStatus('连接失败', '#c66');
+				alert('API 连接测试失败\n\n' + result.error);
 			}
 		}
-		
-		function updateScreenInfo() {
-			var scr = document.getElementById('api-scr');
-			var w = window.innerWidth;
-			var h = window.innerHeight;
-			var dpr = window.devicePixelRatio || 1;
-			scr.textContent = w + 'x' + h + ' ' + dpr.toFixed(1) + 'x';
-		}
-		
-		function updateBatteryInfo() {
-			var batt = document.getElementById('api-batt');
-			if ('getBattery' in navigator) {
-				navigator.getBattery().then(function(battery) {
-					var level = Math.round(battery.level * 100);
-					var charging = battery.charging ? '⚡' : '';
-					batt.textContent = level + '%' + charging;
-					if (level <= 20) batt.style.color = '#c66';
-					else if (level <= 50) batt.style.color = '#f96';
-					else batt.style.color = '';
-				}).catch(function() {
-					batt.textContent = 'N/A';
-				});
-			} else {
-				batt.textContent = 'N/A';
-			}
-		}
-		
-		function updateMemoryInfo() {
-			var mem = document.getElementById('api-mem');
-			if (performance.memory) {
-				var usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
-				var totalMB = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
-				mem.textContent = usedMB + 'MB/' + totalMB + 'MB';
-			} else {
-				mem.textContent = 'N/A';
-			}
-		}
-		
-		var pageLoadTime = Date.now();
-		function updateUptime() {
-			var uptime = document.getElementById('api-uptime');
-			var elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
-			var hours = Math.floor(elapsed / 3600);
-			var minutes = Math.floor((elapsed % 3600) / 60);
-			var seconds = elapsed % 60;
-			uptime.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-		}
-		
-		function updateLanguage() {
-			var lang = document.getElementById('api-lang');
-			lang.textContent = navigator.language || 'N/A';
-		}
-		
-		function updateUserAgent() {
-			var ua = document.getElementById('api-ua');
-			var browser = 'N/A';
-			var userAgent = navigator.userAgent;
-			if (/Chrome/.test(userAgent) && !/Edg/.test(userAgent)) browser = 'Chrome';
-			else if (/Firefox/.test(userAgent)) browser = 'Firefox';
-			else if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) browser = 'Safari';
-			else if (/Edg/.test(userAgent)) browser = 'Edge';
-			ua.textContent = browser;
-		}
-		
-		document.addEventListener('DOMContentLoaded', function() {
-			var creds = NovelAPI.getStoredCredentials();
-			
-			if (creds.apiKey) { 
-				document.getElementById('apiKey').value = creds.apiKey; 
-				document.getElementById('currentKey').textContent = '已配置'; 
-			}
-			if (creds.apiPass) { 
-				document.getElementById('apiPass').value = creds.apiPass; 
-				document.getElementById('currentPass').textContent = '已配置'; 
-			}
-			
-			initDynamicData();
+
+		document.addEventListener('DOMContentLoaded', function () {
+			loadStoredCredentials();
+
+			// Live format feedback while typing.
+			['apiKey', 'apiPass'].forEach(function (id) {
+				var input = document.getElementById(id);
+				if (input) { input.addEventListener('input', validateForm); }
+			});
+			validateForm();
 		});
 	</script>
 	

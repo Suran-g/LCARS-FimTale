@@ -129,6 +129,7 @@
 	--primary-color: var(--evening);
 	--secondary-color: var(--cool);
 	--accent-color: #adcaff;  /* bdd1ff */
+	--title-color: var(--accent-color);
 	--spacers: .65rem;
 	--frame-height: 40px;
 }
@@ -221,15 +222,15 @@ input, textarea, button, select {
 @font-face {
 	font-family: 'Antonio';
 	font-weight: 400;
-	src: url('Antonio-Regular.woff2') format('woff2'),
-			 url('Antonio-Regular.woff') format('woff');
+	font-display: swap;
+	src: url('Antonio-Regular.woff') format('woff');
 }
 
 @font-face {
 	font-family: 'Antonio';
 	font-weight: 700;
-	src: url('Antonio-Bold.woff2') format('woff2'),
-			 url('Antonio-Bold.woff') format('woff')
+	font-display: swap;
+	src: url('Antonio-Bold.woff') format('woff');
 }
 
 html {
@@ -1665,6 +1666,52 @@ nav button:nth-child(4) {
 #topBtn:active {
 	filter: brightness(80%);
 }
+
+/* --- Project additions (not part of the upstream LCARS template) --- */
+
+/* Accessibility: nothing defined a focus ring, and `button { outline: none }`
+   removed the browser default, so keyboard users could not see focus at all.
+   :focus-visible keeps the ring for keyboard navigation only. */
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* The template animates .blink / .blink-slow / .blink-fast / .pulse.
+   Respect the OS "reduce motion" setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* .dc-spacer is used in the data cascade on 4 pages but was never defined,
+   so the gap between the label column and the value column collapsed to zero. */
+.dc-spacer {
+  width: var(--spacers);
+  flex: 0 0 var(--spacers);
+}
+
+/* Companion to .display-horizontal (which is `rotate: 90deg`). Explicitly
+   upright, and hidden on narrow viewports where rotated text is unreadable. */
+.display-vertical {
+  rotate: 0deg;
+}
+
+@media (max-width: 525px) {
+  .display-vertical {
+    display: none;
+  }
+}
+
+/* --- end project additions --- */
 
 @media (max-width: 525px)	{
 	.sidebar-button,
